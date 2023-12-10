@@ -39,22 +39,22 @@ export default function Signup() {
     <Paper sx={{ width: '320px', p: 2 }} variant="outlined">
       <Stack sx={{ width: '100%' }} spacing={2} justifyContent="center">
         <Typography variant="h5">
-            Create your account
+          Create your account
         </Typography>
 
         <Typography level="caption" color="#7B91A7">
-            Please fill the required information.
+          Please fill the required information.
         </Typography>
 
         <Stack spacing={1}>
-            <Stack direction='row' spacing={1}>
-                <TextField label="Name" size="small" />
-                <TextField label="Surname" size="small" />
-            </Stack>
-        
-            <TextField error={signupFailed} label="Phone Number" type='tel' size="small" />
-            <TextField error={signupFailed} label="Email" type='email' size="small" />
-            <TextField label="Password" type='password' size="small" />
+          <Stack direction='row' spacing={1}>
+            <TextField label="Name" size="small" />
+            <TextField label="Surname" size="small" />
+          </Stack>
+
+          <TextField error={signupFailed} label="Phone Number" type='tel' size="small" />
+          <TextField error={signupFailed} label="Email" type='email' size="small" />
+          <TextField label="Password" type='password' size="small" />
         </Stack>
 
         <LoadingButton
@@ -70,7 +70,7 @@ export default function Signup() {
           fontSize="small"
           sx={{ alignSelf: 'center' }}
         >
-          Already a member? 
+          Already a member?
           <Link underline="none" href="/login"> Log in</Link>
         </Typography>
 

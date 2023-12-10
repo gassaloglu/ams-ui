@@ -29,16 +29,14 @@ export default function Booker() {
   };
 
   return (
-    <Box sx={{ width: '900px' }}>
-      <TabContext value={activeTab}>
-        <TabList onChange={handleChange} variant='fullWidth'>
-          <Tab icon={<FlightIcon />} iconPosition='start' label="Flights" value="1" />
-          <Tab icon={<AirplaneTicketIcon />} iconPosition='start' label="Check-in" value="2" />
-        </TabList>
-        <TabPanel value="1"> <FlightsTab /> </TabPanel>
-        <TabPanel value="2"> <CheckInTab /> </TabPanel>
-      </TabContext>
-    </Box>
+    <TabContext value={activeTab}>
+      <TabList onChange={handleChange} variant='fullWidth'>
+        <Tab icon={<FlightIcon />} iconPosition='start' label="Flights" value="1" />
+        <Tab icon={<AirplaneTicketIcon />} iconPosition='start' label="Check-in" value="2" />
+      </TabList>
+      <TabPanel value="1"> <FlightsTab /> </TabPanel>
+      <TabPanel value="2"> <CheckInTab /> </TabPanel>
+    </TabContext>
   );
 }
 

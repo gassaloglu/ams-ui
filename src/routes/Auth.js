@@ -14,6 +14,6 @@ import { useOutlet } from "react-router-dom";
  * @returns { AuthProvider } An `AuthProvider` wrapping its outlet.
  */
 export default function Auth() {
-    const outlet = useOutlet();
-    return <AuthProvider> {outlet} </AuthProvider>
+  const outlet = useOutlet();
+  return <AuthProvider> {outlet} </AuthProvider>
 }

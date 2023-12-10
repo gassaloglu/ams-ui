@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(true);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   const login = async data => {
@@ -14,14 +14,14 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     setUser(null);
-    navigate("/", { replace: true });
+    // navigate("/", { replace: true });
   };
 
   const provided = useMemo(() => ({ user, login, logout }), [user]);
 
   return (
-    <AuthContext.Provider value={ provided }>
-      { children }
+    <AuthContext.Provider value={provided}>
+      {children}
     </AuthContext.Provider>
   );
 }

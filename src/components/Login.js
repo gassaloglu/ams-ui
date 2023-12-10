@@ -51,17 +51,17 @@ export default function Login() {
 
         {
           role === 'user'
-            ? <TextField 
-                error={authFailed} 
-                label="Email" 
-                type='email' 
-                size="small" 
-              />
-            : <TextField 
-                error={authFailed}
-                label="Personnel number"
-                size="small"
-              />
+            ? <TextField
+              error={authFailed}
+              label="Email"
+              type='email'
+              size="small"
+            />
+            : <TextField
+              error={authFailed}
+              label="Personnel number"
+              size="small"
+            />
         }
 
         <TextField
