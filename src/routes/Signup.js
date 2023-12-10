@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
-import LoginForm from '../components/Login';
+import SingupForm from '../components/Signup';
 
-export default function Login() {
+export default function Signup() {
     return (
         <Box
             display="flex"
@@ -9,7 +9,7 @@ export default function Login() {
             alignItems="center"
             minHeight="100vh"
         >
-            <LoginForm />
+            <SingupForm />
         </Box>
     );
 }

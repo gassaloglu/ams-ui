@@ -1,18 +1,42 @@
 import { useState } from 'react';
+import { request } from '../utils/request';
+import { useAuth } from '../hooks/useAuth';
 
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
-
-import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import LoadingButton from '@mui/lab/LoadingButton';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import TextField from '@mui/material/TextField';
-
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 
 export default function Login() {
+  const { login } = useAuth();
   const [role, setRole] = useState("user");
+  const [loading, setLoading] = useState(false);
+  const [authFailed, setAuthFailed] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleClick = (_) => {
+    setError(false);
+    setAuthFailed(false);
+    setLoading(true);
+
+    request('/login/placeholder')
+      .then(res => res.json())
+      .then(({ token }) => {
+        if (token) {
+          login({ token });
+        } else {
+          setAuthFailed(true);
+        }
+      })
+      .catch(_ => setError(true))
+      .finally(() => setLoading(false));
+  }
 
   return (
     <Paper sx={{ width: '320px', p: 2 }} variant="outlined">
@@ -25,17 +49,27 @@ export default function Login() {
           Please sign in to continue.
         </Typography>
 
-
         {
           role === 'user'
-            ? <TextField label="Email" type='email' size="small" />
-            : <TextField label="Personnel number" size="small" />
+            ? <TextField 
+                error={authFailed} 
+                label="Email" 
+                type='email' 
+                size="small" 
+              />
+            : <TextField 
+                error={authFailed}
+                label="Personnel number"
+                size="small"
+              />
         }
-        
+
         <TextField
+          error={authFailed}
           label="Password"
           type='password'
           size="small"
+          helperText="Please check your credentials."
         />
 
         <ToggleButtonGroup
@@ -50,8 +84,15 @@ export default function Login() {
           <ToggleButton value="employee">Employee</ToggleButton>
         </ToggleButtonGroup>
 
-        <Button fullWidth variant='contained'>Log in</Button>
-        
+        <LoadingButton
+          loading={loading}
+          disabled={loading}
+          variant='contained'
+          onClick={handleClick}
+        >
+          Log in
+        </LoadingButton>
+
         <Typography
           fontSize="small"
           sx={{ alignSelf: 'center' }}
@@ -59,6 +100,12 @@ export default function Login() {
           Don&apos;t have an account?
           <Link underline="none" href="/signup"> Sign up</Link>
         </Typography>
+
+        <Snackbar open={error}>
+          <Alert severity="error" variant='filled'>
+            An error occurred while requesting credentials.
+          </Alert>
+        </Snackbar>
       </Stack>
     </Paper>
   )
