@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Axios from 'axios';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,6 +20,10 @@ import '@fontsource/roboto/700.css';
 import './styles/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+export const axios = Axios.create({
+  baseURL: "http://localhost:5500",
+});
 
 export const theme = createTheme({
   palette: {

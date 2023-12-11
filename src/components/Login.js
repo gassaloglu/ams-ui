@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { request } from '../utils/request';
+import { axios } from '../index';
 import { useAuth } from '../hooks/useAuth';
 
 import Stack from '@mui/material/Stack';
@@ -15,7 +15,12 @@ import Link from '@mui/material/Link';
 
 export default function Login() {
   const { login } = useAuth();
-  const [role, setRole] = useState("user");
+
+  const [isEmployee, setIsEmployee] = useState(false);
+  const [number, setNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [authFailed, setAuthFailed] = useState(false);
   const [error, setError] = useState(false);
@@ -25,16 +30,17 @@ export default function Login() {
     setAuthFailed(false);
     setLoading(true);
 
-    request('/login/placeholder')
-      .then(res => res.json())
-      .then(({ token }) => {
-        if (token) {
-          login({ token });
+    axios.post('/login', { email, password })
+      .then(response => {
+        login({ token: response.data.token });
+      })
+      .catch(error => {
+        if (error.response) {
+          setAuthFailed(true)
         } else {
-          setAuthFailed(true);
+          setError(true)
         }
       })
-      .catch(_ => setError(true))
       .finally(() => setLoading(false));
   }
 
@@ -50,17 +56,21 @@ export default function Login() {
         </Typography>
 
         {
-          role === 'user'
+          isEmployee
             ? <TextField
+              error={authFailed}
+              label="Personnel number"
+              size="small"
+              value={number}
+              onChange={(e) => setNumber(e.target.value)}
+            />
+            : <TextField
               error={authFailed}
               label="Email"
               type='email'
               size="small"
-            />
-            : <TextField
-              error={authFailed}
-              label="Personnel number"
-              size="small"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
         }
 
@@ -70,6 +80,8 @@ export default function Login() {
           type='password'
           size="small"
           helperText="Please check your credentials."
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
         <ToggleButtonGroup
@@ -77,8 +89,8 @@ export default function Login() {
           color="primary"
           size='small'
           fullWidth
-          value={role}
-          onChange={(e, v) => setRole(v)}
+          value={isEmployee ? 'employee' : 'user'}
+          onChange={(e, v) => setIsEmployee(v === 'employee')}
         >
           <ToggleButton value="user">User</ToggleButton>
           <ToggleButton value="employee">Employee</ToggleButton>

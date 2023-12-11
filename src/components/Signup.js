@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { request } from '../utils/request';
 import { useAuth } from '../hooks/useAuth';
 
 import Stack from '@mui/material/Stack';
@@ -22,17 +21,17 @@ export default function Signup() {
     setSignupFailed(false);
     setLoading(true);
 
-    request('/login/placeholder')
-      .then(res => res.json())
-      .then(({ token }) => {
-        if (token) {
-          login({ token });
-        } else {
-          setSignupFailed(true);
-        }
-      })
-      .catch(_ => setError(true))
-      .finally(() => setLoading(false));
+    // request('/login/placeholder')
+    //   .then(res => res.json())
+    //   .then(({ token }) => {
+    //     if (token) {
+    //       login({ token });
+    //     } else {
+    //       setSignupFailed(true);
+    //     }
+    //   })
+    //   .catch(_ => setError(true))
+    //   .finally(() => setLoading(false));
   }
 
   return (
