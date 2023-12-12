@@ -12,6 +12,7 @@ import Home from './routes/Home';
 import Login from './routes/Login';
 import Signup from './routes/Signup';
 import Profile from './routes/Profile';
+import Book from './routes/Book';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <Signup />,
+      },
+      {
+        path: "/book",
+        element: <Book />,
       },
       {
         path: "/profile",
