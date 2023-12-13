@@ -1,6 +1,14 @@
-import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, Card } from "@mui/material";
+import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import { ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
+
+import dayjs from 'dayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+// TODO: Use styled-components
+// TODO: Phone number input
 
 export default function Book() {
   return (
@@ -8,15 +16,51 @@ export default function Book() {
       <Stack sx={{ width: '900px' }} spacing={2} direction='column' alignItems='stretch'>
         <Details />
         <Steps />
-        <Flights />
+        <Stack alignItems='center'>
+          {/* <PassengerForm /> */}
+          < Flights />
+        </Stack>
       </Stack >
     </Box >
   );
 }
 
+function PassengerForm() {
+  return (
+    <Stack spacing={1} minWidth='300px'>
+      <TextField label="Name" />
+      <TextField label="Surname" />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker />
+      </LocalizationProvider>
+      <TextField label="Turkish ID Number" />
+      <TextField label="Phone number" />
+      <GenderSelection value='female' onChange={() => { }} />
+    </Stack>
+  );
+}
+
+function GenderSelection({ value, onChange }) {
+  return (
+    <FormControl>
+      <FormLabel id="demo-controlled-radio-buttons-group">Gender</FormLabel>
+      <RadioGroup
+        aria-labelledby="demo-controlled-radio-buttons-group"
+        name="controlled-radio-buttons-group"
+        value={value}
+        onChange={onChange}
+        row
+      >
+        <FormControlLabel value="female" control={<Radio />} label="Female" />
+        <FormControlLabel value="male" control={<Radio />} label="Male" />
+      </RadioGroup>
+    </FormControl>
+  );
+}
+
 function Steps() {
   return (
-    <Stepper alternativeLabel>
+    <Stepper alternativeLabel >
       <Step>
         <StepLabel> Flight </StepLabel>
       </Step>
