@@ -1,8 +1,7 @@
-import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid } from "@mui/material";
+import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid, IconButton } from "@mui/material";
 import { EventSeat, ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
 
-import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,7 +10,8 @@ import { createContext, useContext, useState } from "react";
 // TODO: Use styled-components
 // TODO: Phone number input
 
-const BookingContext = createContext({ step: 0, setStep: () => { } });
+const BookingContext = createContext({});
+const SeatContext = createContext({});
 
 export default function Booking() {
   const [step, setStep] = useState(0);
@@ -39,18 +39,38 @@ export default function Booking() {
 }
 
 const left = 3, mid = 4, right = 3;
-const rows = 20, columns = left + mid + right;
-const seats = Array((left + mid + right) * rows).fill(false);
+const rows = 10, columns = left + mid + right;
+
+const occupied = Array((left + mid + right) * rows).fill(false).map(_ => Math.random() > 0.5);
 
 function SeatSelection() {
-  const [seat, setSeat] = useState(null);
+  const [selectedSeat, setSelectedSeat] = useState(150);
+  const context = { occupied, selectedSeat, setSelectedSeat };
 
   return (
-    <Grid container spacing={5} columns={columns} justifyContent='center'>
-      <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
-      <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
-      <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
-    </Grid >
+    <SeatContext.Provider value={context}>
+      <Grid container spacing={5} columns={columns} justifyContent='center'>
+        <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
+        <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
+        <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
+      </Grid >
+    </SeatContext.Provider>
+  );
+}
+
+function Seat({ number }) {
+  const { occupied, selectedSeat, setSelectedSeat } = useContext(SeatContext);
+
+  const color = occupied[number]
+    ? 'primary.main'
+    : (selectedSeat === number ? 'orange' : 'grey')
+
+  return (
+    <IconButton
+      onClick={() => { if (!occupied[number]) setSelectedSeat(number) }}
+    >
+      <EventSeat sx={{ fontSize: 60, color }} />
+    </IconButton>
   );
 }
 
@@ -59,10 +79,11 @@ function SeatContainer({ columns, rows, offset, step }) {
     <Grid container item xs={columns}>
       {[...Array(columns * rows).keys()].map(i => {
         const seatNumber = offset + (i % columns) + step * Math.floor(i / columns);
+
         return (
           <Grid item xs={12 / columns} key={seatNumber}>
             <Box display='flex' alignItems="center" justifyContent="center">
-              <EventSeat />
+              <Seat number={seatNumber} />
             </Box>
           </Grid>
         );
