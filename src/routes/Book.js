@@ -6,28 +6,28 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import AppBar from "../components/AppBar";
 
 // TODO: Use styled-components
 // TODO: Phone number input
 
 export default function Book() {
   return (
-    <Box padding={2} display='flex' justifyContent='center'>
-      <Stack sx={{ width: '900px' }} spacing={2} direction='column' alignItems='stretch'>
+    <>
+      <AppBar />
+      <Stack spacing={2} alignItems='stretch' sx={{ m: 'auto', p: 2, width: '900px' }}>
         <Details />
         <Steps />
-        <Stack alignItems='center'>
-          {/* <PassengerForm /> */}
-          < Flights />
-        </Stack>
+        {/* <PassengerForm /> */}
+        <Flights />
       </Stack >
-    </Box >
+    </>
   );
 }
 
 function PassengerForm() {
   return (
-    <Stack spacing={1} minWidth='300px'>
+    <Stack spacing={1} sx={{ m: 'auto', maxWidth: '300px' }}>
       <TextField label="Name" />
       <TextField label="Surname" />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -60,7 +60,7 @@ function GenderSelection({ value, onChange }) {
 
 function Steps() {
   return (
-    <Stepper alternativeLabel >
+    <Stepper alternativeLabel>
       <Step>
         <StepLabel> Flight </StepLabel>
       </Step>
