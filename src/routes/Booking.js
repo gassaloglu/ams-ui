@@ -1,5 +1,5 @@
-import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
-import { ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
+import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid } from "@mui/material";
+import { EventSeat, ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
 
 import dayjs from 'dayjs';
@@ -29,11 +29,46 @@ export default function Booking() {
           <Details />
           <Steps />
           <Stack alignItems='center'>
-            {componentOfStep[step]}
+            <SeatSelection />
+            {/* {componentOfStep[step]} */}
           </Stack>
         </Stack >
       </Box >
     </BookingContext.Provider>
+  );
+}
+
+const left = 3, mid = 4, right = 3;
+const rows = 20, columns = left + mid + right;
+const seats = Array((left + mid + right) * rows).fill(false);
+
+function SeatSelection() {
+  const [seat, setSeat] = useState(null);
+
+  return (
+    <Grid container spacing={5} columns={columns} justifyContent='center'>
+      <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
+      <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
+      <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
+    </Grid >
+  );
+}
+
+function SeatContainer({ columns, rows, offset, step }) {
+  return (
+    <Grid container item xs={columns}>
+      {[...Array(columns * rows).keys()].map(i => {
+        const seatNumber = offset + (i % columns) + step * Math.floor(i / columns);
+        return (
+          <Grid item xs={12 / columns} key={seatNumber}>
+            <Box display='flex' alignItems="center" justifyContent="center">
+              <EventSeat />
+            </Box>
+          </Grid>
+        );
+      })}
+    </Grid>
+
   );
 }
 
