@@ -6,26 +6,40 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { createContext, useContext, useState } from "react";
 
 // TODO: Use styled-components
 // TODO: Phone number input
 
-export default function Book() {
+const BookingContext = createContext({ step: 0, setStep: () => { } });
+
+export default function Booking() {
+  const [step, setStep] = useState(0);
+  const context = { step, setStep };
+
+  const componentOfStep = [
+    < Flights />,
+    <PassengerForm />,
+  ]
+
   return (
-    <Box padding={2} display='flex' justifyContent='center'>
-      <Stack sx={{ width: '900px' }} spacing={2} direction='column' alignItems='stretch'>
-        <Details />
-        <Steps />
-        <Stack alignItems='center'>
-          {/* <PassengerForm /> */}
-          < Flights />
-        </Stack>
-      </Stack >
-    </Box >
+    <BookingContext.Provider value={context}>
+      <Box padding={2} display='flex' justifyContent='center'>
+        <Stack sx={{ width: '900px' }} spacing={2} direction='column' alignItems='stretch'>
+          <Details />
+          <Steps />
+          <Stack alignItems='center'>
+            {componentOfStep[step]}
+          </Stack>
+        </Stack >
+      </Box >
+    </BookingContext.Provider>
   );
 }
 
 function PassengerForm() {
+  const { setStep } = useContext(BookingContext);
+
   return (
     <Stack spacing={1} minWidth='300px'>
       <TextField label="Name" />
@@ -36,6 +50,13 @@ function PassengerForm() {
       <TextField label="Turkish ID Number" />
       <TextField label="Phone number" />
       <GenderSelection value='female' onChange={() => { }} />
+      <Button
+        size='large'
+        variant='contained'
+        onClick={() => setStep(2)}
+      >
+        Submit
+      </Button>
     </Stack>
   );
 }
@@ -59,8 +80,10 @@ function GenderSelection({ value, onChange }) {
 }
 
 function Steps() {
+  const { step } = useContext(BookingContext);
+
   return (
-    <Stepper alternativeLabel >
+    <Stepper alternativeLabel activeStep={step}>
       <Step>
         <StepLabel> Flight </StepLabel>
       </Step>
@@ -145,7 +168,7 @@ function Flight({ from, to, departure, arrival, price }) {
       </AccordionSummary>
 
       <AccordionDetails>
-        <Stack sx={{ paddingBottom: 1 }} direction='row' justifyContent='space-evenly'>
+        <Stack spacing={1} sx={{ paddingBottom: 1 }} direction='row' justifyContent='space-evenly'>
           <Plan label='essentials' dash={blue[500]} price={price}>
             <Benefit icon={<Luggage />}> 15 Kg. Luggage </Benefit>
           </Plan>
@@ -166,6 +189,8 @@ function Flight({ from, to, departure, arrival, price }) {
 }
 
 function Plan({ label, price, dash, children }) {
+  const { setStep } = useContext(BookingContext);
+
   return (
     <Paper
       sx={{
@@ -199,6 +224,7 @@ function Plan({ label, price, dash, children }) {
         <Button
           sx={{ minWidth: '190px' }}
           variant='contained'
+          onClick={(_) => setStep(1)}
         >
           {price} ₺
         </Button>
