@@ -1,5 +1,5 @@
-import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepLabel, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid, IconButton } from "@mui/material";
-import { EventSeat, ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
+import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepButton, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid, IconButton } from "@mui/material";
+import { ArrowRight, EventSeat, ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
 import AppBar from "../components/AppBar";
 
@@ -21,6 +21,7 @@ export default function Booking() {
   const componentOfStep = [
     < Flights />,
     <PassengerForm />,
+    <SeatSelection />,
   ]
 
   return (
@@ -28,12 +29,11 @@ export default function Booking() {
       <AppBar />
       <BookingContext.Provider value={context}>
         <Box padding={2} display='flex' justifyContent='center'>
-          <Stack sx={{ width: '900px' }} spacing={2} direction='column' alignItems='stretch'>
+          <Stack sx={{ width: '900px' }} spacing={3} alignItems='stretch'>
             <Details />
             <Steps />
             <Stack alignItems='center'>
-              <SeatSelection />
-              {/* {componentOfStep[step]} */}
+              {componentOfStep[step]}
             </Stack>
           </Stack >
         </Box >
@@ -48,12 +48,30 @@ const rows = 10, columns = left + mid + right;
 const occupied = Array((left + mid + right) * rows).fill(false).map(_ => Math.random() > 0.5);
 
 function SeatSelection() {
-  const [selectedSeat, setSelectedSeat] = useState(150);
+  const { step, setStep } = useContext(BookingContext);
+  const [selectedSeat, setSelectedSeat] = useState(null);
   const context = { occupied, selectedSeat, setSelectedSeat };
 
   return (
     <SeatContext.Provider value={context}>
-      <Grid container spacing={5} columns={columns} justifyContent='center'>
+      <Stack direction='row' spacing={5}>
+        <Stack spacing={1} direction='row' alignItems='center' divider={<Divider orientation="vertical" flexItem />}>
+          <SeatDescription color={SeatColor.occupied} label="Occupied" />
+          <SeatDescription color={SeatColor.vacant} label="Vacant" />
+          <SeatDescription color={SeatColor.selected} label="Selected" />
+        </Stack>
+
+        <Button
+          sx={{ width: '150px' }}
+          disabled={selectedSeat === null}
+          variant='contained'
+          endIcon={<ArrowRight />}
+          onClick={() => setStep(step + 1)}
+        >
+          Continue
+        </Button>
+      </Stack>
+      <Grid container spacing={5} columns={columns} justifyContent='center' sx={{ pt: 2 }}>
         <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
         <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
         <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
@@ -62,42 +80,8 @@ function SeatSelection() {
   );
 }
 
-function Seat({ number }) {
-  const { occupied, selectedSeat, setSelectedSeat } = useContext(SeatContext);
-
-  const color = occupied[number]
-    ? 'primary.main'
-    : (selectedSeat === number ? 'orange' : 'grey')
-
-  return (
-    <IconButton
-      onClick={() => { if (!occupied[number]) setSelectedSeat(number) }}
-    >
-      <EventSeat sx={{ fontSize: 60, color }} />
-    </IconButton>
-  );
-}
-
-function SeatContainer({ columns, rows, offset, step }) {
-  return (
-    <Grid container item xs={columns}>
-      {[...Array(columns * rows).keys()].map(i => {
-        const seatNumber = offset + (i % columns) + step * Math.floor(i / columns);
-
-        return (
-          <Grid item xs={12 / columns} key={seatNumber}>
-            <Box display='flex' alignItems="center" justifyContent="center">
-              <Seat number={seatNumber} />
-            </Box>
-          </Grid>
-        );
-      })}
-    </Grid>
-  );
-}
-
 function PassengerForm() {
-  const { setStep } = useContext(BookingContext);
+  const { step, setStep } = useContext(BookingContext);
 
   return (
     <Stack spacing={1} sx={{ m: 'auto', maxWidth: '300px' }}>
@@ -112,7 +96,7 @@ function PassengerForm() {
       <Button
         size='large'
         variant='contained'
-        onClick={() => setStep(2)}
+        onClick={() => setStep(step + 1)}
       >
         Submit
       </Button>
@@ -139,21 +123,29 @@ function GenderSelection({ value, onChange }) {
 }
 
 function Steps() {
-  const { step } = useContext(BookingContext);
+  const { step, setStep } = useContext(BookingContext);
 
   return (
     <Stepper alternativeLabel activeStep={step}>
       <Step>
-        <StepLabel> Flight </StepLabel>
+        <StepButton onClick={setStep(0)}>
+          Flight
+        </StepButton>
       </Step>
       <Step>
-        <StepLabel> Passenger Information </StepLabel>
+        <StepButton onClick={setStep(1)}>
+          Passenger Information
+        </StepButton>
       </Step>
       <Step>
-        <StepLabel> Personalisation </StepLabel>
+        <StepButton onClick={setStep(2)}>
+          Personalisation
+        </StepButton>
       </Step>
       <Step>
-        <StepLabel> Payment </StepLabel>
+        <StepButton onClick={setStep(3)}>
+          Payment
+        </StepButton>
       </Step>
     </Stepper>
   )
@@ -248,7 +240,7 @@ function Flight({ from, to, departure, arrival, price }) {
 }
 
 function Plan({ label, price, dash, children }) {
-  const { setStep } = useContext(BookingContext);
+  const { step, setStep } = useContext(BookingContext);
 
   return (
     <Paper
@@ -283,7 +275,7 @@ function Plan({ label, price, dash, children }) {
         <Button
           sx={{ minWidth: '190px' }}
           variant='contained'
-          onClick={(_) => setStep(1)}
+          onClick={(_) => setStep(step + 1)}
         >
           {price} ₺
         </Button>
