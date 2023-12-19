@@ -8,20 +8,24 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { createContext, useContext, useState } from "react";
 
+import { SeatPlan } from '../components/Seat';
+
 // TODO: Use styled-components
 // TODO: Phone number input
 
 const BookingContext = createContext({});
 const SeatContext = createContext({});
 
+const occupation = Array(100).fill(false).map(_ => Math.random() > 0.5);
+
 export default function Booking() {
   const [step, setStep] = useState(0);
   const context = { step, setStep };
 
   const componentOfStep = [
-    < Flights />,
-    <PassengerForm />,
-    <SeatSelection />,
+    // < Flights />,
+    // <PassengerForm />,
+    // <SeatSelection />,
   ]
 
   return (
@@ -30,10 +34,10 @@ export default function Booking() {
       <BookingContext.Provider value={context}>
         <Box padding={2} display='flex' justifyContent='center'>
           <Stack sx={{ width: '900px' }} spacing={3} alignItems='stretch'>
-            <Details />
-            <Steps />
+            {/* <Details /> */}
+            {/* <Steps /> */}
             <Stack alignItems='center'>
-              {componentOfStep[step]}
+              <SeatPlan occupation={occupation} columns={[3, 4, 3]} rows={10} />
             </Stack>
           </Stack >
         </Box >
@@ -42,43 +46,38 @@ export default function Booking() {
   );
 }
 
-const left = 3, mid = 4, right = 3;
-const rows = 10, columns = left + mid + right;
+// function SeatSelection() {
+//   const { step, setStep } = useContext(BookingContext);
+//   const [selectedSeat, setSelectedSeat] = useState(null);
+//   const context = { occupied, selectedSeat, setSelectedSeat };
 
-const occupied = Array((left + mid + right) * rows).fill(false).map(_ => Math.random() > 0.5);
+//   return (
+//     <SeatContext.Provider value={context}>
+//       <Stack direction='row' spacing={5}>
+//         <Stack spacing={1} direction='row' alignItems='center' divider={<Divider orientation="vertical" flexItem />}>
+//           <SeatDescription color={SeatColor.occupied} label="Occupied" />
+//           <SeatDescription color={SeatColor.vacant} label="Vacant" />
+//           <SeatDescription color={SeatColor.selected} label="Selected" />
+//         </Stack>
 
-function SeatSelection() {
-  const { step, setStep } = useContext(BookingContext);
-  const [selectedSeat, setSelectedSeat] = useState(null);
-  const context = { occupied, selectedSeat, setSelectedSeat };
-
-  return (
-    <SeatContext.Provider value={context}>
-      <Stack direction='row' spacing={5}>
-        <Stack spacing={1} direction='row' alignItems='center' divider={<Divider orientation="vertical" flexItem />}>
-          <SeatDescription color={SeatColor.occupied} label="Occupied" />
-          <SeatDescription color={SeatColor.vacant} label="Vacant" />
-          <SeatDescription color={SeatColor.selected} label="Selected" />
-        </Stack>
-
-        <Button
-          sx={{ width: '150px' }}
-          disabled={selectedSeat === null}
-          variant='contained'
-          endIcon={<ArrowRight />}
-          onClick={() => setStep(step + 1)}
-        >
-          Continue
-        </Button>
-      </Stack>
-      <Grid container spacing={5} columns={columns} justifyContent='center' sx={{ pt: 2 }}>
-        <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
-        <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
-        <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
-      </Grid >
-    </SeatContext.Provider>
-  );
-}
+//         <Button
+//           sx={{ width: '150px' }}
+//           disabled={selectedSeat === null}
+//           variant='contained'
+//           endIcon={<ArrowRight />}
+//           onClick={() => setStep(step + 1)}
+//         >
+//           Continue
+//         </Button>
+//       </Stack>
+//       <Grid container spacing={5} columns={columns} justifyContent='center' sx={{ pt: 2 }}>
+//         <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
+//         <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
+//         <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
+//       </Grid >
+//     </SeatContext.Provider>
+//   );
+// }
 
 function PassengerForm() {
   const { step, setStep } = useContext(BookingContext);
