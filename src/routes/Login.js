@@ -1,15 +1,10 @@
-import Box from '@mui/material/Box';
 import LoginForm from '../components/Login';
+import { Center } from '../components/Styled';
 
 export default function Login() {
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-    >
+    <Center>
       <LoginForm />
-    </Box>
+    </Center>
   );
 }

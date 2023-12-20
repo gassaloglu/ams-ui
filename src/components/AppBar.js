@@ -6,7 +6,7 @@ export default function AppBar() {
   const { user, logout } = useAuth();
 
   return (
-    <MuiAppBar position='static'>
+    <MuiAppBar position='sticky'>
       <Toolbar>
         <IconButton
           disableRipple
