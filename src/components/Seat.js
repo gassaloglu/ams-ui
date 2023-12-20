@@ -1,6 +1,6 @@
-import { Box, IconButton, Stack, Typography, Grid } from '@mui/material';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
 import { EventSeat as SeatIcon } from '@mui/icons-material';
-import { chunk, zip } from 'underscore';
+import styled from '@emotion/styled';
 
 const color = {
   occupied: 'primary.main',
@@ -24,47 +24,55 @@ const SeatBase = ({ variant, onClick }) => (
 );
 
 const OccupiedSeat = () => <SeatBase variant='occupied' />;
-const VacantSeat = ({ selected, onClick }) => <SeatBase variant={selected ? 'selected' : 'vacant'} onClick={onClick} />
+const VacantSeat = ({ selected, onClick }) =>
+  <SeatBase variant={selected ? 'selected' : 'vacant'} onClick={onClick} />;
 
-function SeatPlanRow({ occupation, row, columns, onClick }) {
-  const seats = [];
-  let accumulator = 0;
-  for (const column of columns) {
-    const slice = occupation
-      .slice(accumulator, column)
-      .map(ocp => ocp ? <OccupiedSeat /> : <VacantSeat onClick={onClick} />);
+const Cell = styled(Typography)({
+  width: '76px',
+  height: '76px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  fontSize: 30,
+  fontWeight: 'bold',
+  color: 'grey',
+});
 
-    seats.push(slice);
-    seats.push(<Typography> Empty </Typography>);
-  }
+const abc = ['A', 'B', 'C', '', 'D', 'E', 'F', '', 'G', 'H', 'I'];
 
+export function SeatPlan({ plan, isSelected, onSelect }) {
+  const seatMapper = (rowId, areaId) =>
+    (occupied, seatId) => (
+      occupied
+        ? <OccupiedSeat key={`seat - ${rowId} - ${areaId} - ${seatId}`} />
+        : <VacantSeat
+          key={`seat - ${rowId} - ${areaId} - ${seatId}`}
+          onClick={() => onSelect({ rowId, areaId, seatId })}
+          selected={isSelected({ rowId, areaId, seatId })}
+        />
+    );
+
+  const areaMapper = (rowId) =>
+    (area, areaId) => areaId === 0
+      ? area.map(seatMapper(rowId, areaId))
+      : [<Cell key={`gap - ${rowId} - ${areaId}`} />, ...area.map(seatMapper(rowId, areaId))]
+
+  const rowMapper = (row, rowId) => (
+    <Stack key={`row - ${rowId}`} direction='row' >
+      <Cell> {rowId + 1}</Cell>
+      {row.map(areaMapper(rowId))}
+      <Cell> {rowId + 1}</Cell>
+    </Stack >
+  );
   return (
-    <Grid container>
+    <Stack>
+      <Stack direction='row' justifyContent='space-evenly'>
+        <Cell />
+        {abc.map((a, i) => a ? <Cell key={i}>{a}</Cell> : <Cell key={i} />)}
+        <Cell />
+      </Stack>
 
-    </Grid>
+      {plan.map(rowMapper)}
+    </Stack>
   );
 }
-
-export function SeatPlan(props) {
-  const sum = props.columns.reduce((a, b) => a + b);
-  const gaps = props.columns.length;
-  const rows = chunk(props.occupation, sum);
-
-  return (
-    <Grid container>
-      {rows.map((row, index) =>
-        <Grid container key={`row-${index}`}>
-          <Grid item> {index + 1}</Grid>
-          <Typography>Berkay</Typography>
-          <Grid item> {index + 1}</Grid>
-        </Grid>
-      )}
-    </Grid>
-  );
-}
-
-// <Grid item xs={ } key={seatNumber}>
-// <Box display='flex' alignItems="center" justifyContent="center">
-//   <Seat number={seatNumber} />
-// </Box>
-// </Grid>

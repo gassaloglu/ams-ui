@@ -1,32 +1,29 @@
-import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepButton, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid, IconButton } from "@mui/material";
-import { ArrowRight, EventSeat, ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
-import { red, green, blue } from '@mui/material/colors';
-import AppBar from "../components/AppBar";
+import { createContext, useContext, useState } from "react";
+import { chunk, isEqual } from 'underscore';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { createContext, useContext, useState } from "react";
 
-import { SeatPlan } from '../components/Seat';
+import { Box, Button, Accordion, AccordionSummary, AccordionDetails, Divider, Paper, Stack, Step, StepButton, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Grid, IconButton } from "@mui/material";
+import { ArrowRight, EventSeat, ArrowCircleRightOutlined, ExpandMore, TrendingFlat, Luggage, Restaurant, FlightClass, RestartAltOutlined } from '@mui/icons-material';
+import { red, green, blue } from '@mui/material/colors';
+
+import AppBar from "../components/AppBar";
+import { SeatPlan, SeatDescription } from '../components/Seat';
 
 // TODO: Use styled-components
 // TODO: Phone number input
 
 const BookingContext = createContext({});
-const SeatContext = createContext({});
 
-const occupation = Array(100).fill(false).map(_ => Math.random() > 0.5);
+const fiftyfifty = () => Math.random() > 0.5;
+const randomOccupation = Array(99).fill(false).map(fiftyfifty);
+const plan = chunk(chunk(randomOccupation, 3), 3);
 
 export default function Booking() {
   const [step, setStep] = useState(0);
   const context = { step, setStep };
-
-  const componentOfStep = [
-    // < Flights />,
-    // <PassengerForm />,
-    // <SeatSelection />,
-  ]
 
   return (
     <>
@@ -34,10 +31,10 @@ export default function Booking() {
       <BookingContext.Provider value={context}>
         <Box padding={2} display='flex' justifyContent='center'>
           <Stack sx={{ width: '900px' }} spacing={3} alignItems='stretch'>
-            {/* <Details /> */}
-            {/* <Steps /> */}
+            <Details />
+            <Steps />
             <Stack alignItems='center'>
-              <SeatPlan occupation={occupation} columns={[3, 4, 3]} rows={10} />
+              <SeatSelection />
             </Stack>
           </Stack >
         </Box >
@@ -46,38 +43,33 @@ export default function Booking() {
   );
 }
 
-// function SeatSelection() {
-//   const { step, setStep } = useContext(BookingContext);
-//   const [selectedSeat, setSelectedSeat] = useState(null);
-//   const context = { occupied, selectedSeat, setSelectedSeat };
+function SeatSelection() {
+  const { step, setStep } = useContext(BookingContext);
+  const [selectedSeat, setSelectedSeat] = useState(null);
 
-//   return (
-//     <SeatContext.Provider value={context}>
-//       <Stack direction='row' spacing={5}>
-//         <Stack spacing={1} direction='row' alignItems='center' divider={<Divider orientation="vertical" flexItem />}>
-//           <SeatDescription color={SeatColor.occupied} label="Occupied" />
-//           <SeatDescription color={SeatColor.vacant} label="Vacant" />
-//           <SeatDescription color={SeatColor.selected} label="Selected" />
-//         </Stack>
+  return (
+    <>
+      <Stack direction='row' spacing={5}>
+        <Stack spacing={2} direction='row' alignItems='center' divider={<Divider orientation="vertical" flexItem />}>
+          <SeatDescription variant="occupied" label="Occupied" />
+          <SeatDescription variant="vacant" label="Vacant" />
+          <SeatDescription variant="selected" label="Selected" />
+        </Stack>
+        <Button
+          sx={{ width: '150px' }}
+          disabled={selectedSeat === null}
+          variant='contained'
+          endIcon={<ArrowRight />}
+          onClick={() => setStep(step + 1)}
+        >
+          Continue
+        </Button>
+      </Stack>
 
-//         <Button
-//           sx={{ width: '150px' }}
-//           disabled={selectedSeat === null}
-//           variant='contained'
-//           endIcon={<ArrowRight />}
-//           onClick={() => setStep(step + 1)}
-//         >
-//           Continue
-//         </Button>
-//       </Stack>
-//       <Grid container spacing={5} columns={columns} justifyContent='center' sx={{ pt: 2 }}>
-//         <SeatContainer columns={left} rows={rows} offset={0} step={columns} />
-//         <SeatContainer columns={mid} rows={rows} offset={left} step={columns} />
-//         <SeatContainer columns={right} rows={rows} offset={left + mid} step={columns} />
-//       </Grid >
-//     </SeatContext.Provider>
-//   );
-// }
+      <SeatPlan plan={plan} isSelected={seat => isEqual(seat, selectedSeat)} onSelect={setSelectedSeat} />
+    </>
+  );
+}
 
 function PassengerForm() {
   const { step, setStep } = useContext(BookingContext);
@@ -191,7 +183,6 @@ function Flights() {
     </Stack>
   );
 }
-
 
 function Flight({ from, to, departure, arrival, price }) {
   return (
