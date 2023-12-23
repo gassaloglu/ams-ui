@@ -4,40 +4,42 @@ import dayjs from 'dayjs';
 
 import AppBar from '../components/AppBar';
 import { Center } from '../components/Styled';
-import { NotFound, SomethingWentWrong } from '../components/Error';
+import Error from '../components/Error';
+import Page from '../components/Page';
 import { Divider, Paper, Grid, Stack, Typography } from '@mui/material';
 
 export function CheckIn() {
   const { checkin, flight } = useLoaderData();
 
   return (
-    <>
-      <AppBar />
+    <Page>
       <Center>
         <CheckInData checkin={checkin} flight={flight} />
       </Center>
-    </>
+    </Page>
   );
 }
 
 export function CheckInError() {
   const error = useRouteError();
-  return error.response ? <NotFound /> : <SomethingWentWrong />;
+
+  return (
+    <Page>
+      <Center>
+        {
+          error.response
+            ? <Error title="Not found">No records found matching your PNR and surname.</Error>
+            : <Error title="Something went wrong">It appears that a network has error occurred.</Error>
+        }
+      </Center >
+    </Page>
+  );
 }
 
-export async function checkInLoader({ params }) {
-  const checkinResponse = await axios.post('/passenger/pnr', {
-    token: "00000000000",
-    pnr: params.pnr,
-    surname: params.surname,
-  });
-
+export async function checkInLoader({ params: { pnr, surname } }) {
+  const checkinResponse = await axios.get(`/ticket/${pnr}/${surname}`);
   const checkin = checkinResponse.data[0];
-
-  const flightResponse = await axios.post('/flight/getflightsbyflightnumber', {
-    flight_number: checkin.flight_number,
-  });
-
+  const flightResponse = await axios.get(`/flight/${checkin.flight_number}`);
   const flight = flightResponse.data[0];
 
   return { checkin, flight };

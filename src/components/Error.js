@@ -1,7 +1,14 @@
-export function SomethingWentWrong() {
-  return <p>Something went wrong :c</p>
-}
+import { Paper, Typography } from "@mui/material";
 
-export function NotFound() {
-  return <p> Not found </p>
+export default function Error({ title, children }) {
+  return (
+    <Paper sx={{ p: 3, borderRadius: 2 }} elevation={3} >
+      <Typography variant='h3'>
+        {title}
+      </Typography>
+      <Typography>
+        {children}
+      </Typography>
+    </Paper>
+  )
 }
