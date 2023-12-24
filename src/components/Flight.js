@@ -1,6 +1,8 @@
+import { useContext } from 'react';
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Box, Stack, Paper, Button } from '@mui/material';
 import { ExpandMore, TrendingFlat, Luggage, FlightClass, Restaurant } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
+import { BookingContext } from '../routes/Booking';
 
 export default function Flight({ from, to, departure, arrival, price }) {
   return (
@@ -48,7 +50,7 @@ export default function Flight({ from, to, departure, arrival, price }) {
 }
 
 function Plan({ label, price, dash, children }) {
-  const { step, setStep } = { step: 0, setStep: () => { } };
+  const { step, nextStep } = useContext(BookingContext);
 
   return (
     <Paper
@@ -83,7 +85,7 @@ function Plan({ label, price, dash, children }) {
         <Button
           sx={{ minWidth: '190px' }}
           variant='contained'
-          onClick={(_) => setStep(step + 1)}
+          onClick={nextStep}
         >
           {price} ₺
         </Button>

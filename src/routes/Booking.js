@@ -8,38 +8,43 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import { ArrowRight, ArrowCircleRightOutlined } from '@mui/icons-material';
 
-import AppBar from "../components/AppBar";
 import { SeatPlan, SeatDescription } from '../components/Seat';
+import Page from "../components/Page";
 import Flight from '../components/Flight';
 
-// TODO: Use styled-components
-// TODO: Phone number input
-
-const BookingContext = createContext({});
+export const BookingContext = createContext({});
 
 const fiftyfifty = () => Math.random() > 0.5;
 const randomOccupation = Array(99).fill(false).map(fiftyfifty);
 const plan = chunk(chunk(randomOccupation, 3), 3);
 
+const steps = [
+  <Flights />,
+  <PassengerForm />,
+  <SeatSelection />,
+  <Payment />
+];
+
 export default function Booking() {
   const [step, setStep] = useState(0);
-  const context = { step, setStep };
+
+  const nextStep = () => setStep(step + 1)
+  const context = { step, setStep, nextStep };
 
   return (
-    <>
-      <AppBar />
-      <BookingContext.Provider value={context}>
+    <BookingContext.Provider value={context}>
+      <Page>
         <Box padding={2} display='flex' justifyContent='center'>
           <Stack sx={{ width: '900px' }} spacing={3} alignItems='stretch'>
             <Details />
             <Steps />
             <Stack alignItems='center'>
-              <SeatSelection />
+              {steps[step]}
             </Stack>
           </Stack >
         </Box >
-      </BookingContext.Provider>
-    </>
+      </Page>
+    </BookingContext.Provider>
   );
 }
 
@@ -118,23 +123,23 @@ function Steps() {
 
   return (
     <Stepper alternativeLabel activeStep={step}>
-      <Step>
-        <StepButton onClick={setStep(0)}>
+      <Step >
+        <StepButton onClick={() => setStep(0)}>
           Flight
         </StepButton>
       </Step>
       <Step>
-        <StepButton onClick={setStep(1)}>
-          Passenger Information
+        <StepButton onClick={() => setStep(1)}>
+          Passenger information
         </StepButton>
       </Step>
       <Step>
-        <StepButton onClick={setStep(2)}>
-          Personalisation
+        <StepButton onClick={() => setStep(2)}>
+          Seat selection
         </StepButton>
       </Step>
       <Step>
-        <StepButton onClick={setStep(3)}>
+        <StepButton onClick={() => setStep(3)}>
           Payment
         </StepButton>
       </Step>
@@ -176,10 +181,16 @@ const flights = [
   { id: 5, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
 ]
 
-function Flights() {
+function Flights({ onSelect }) {
   return (
     <Stack spacing={0}>
       {flights.map(({ id, ...props }) => <Flight key={id} {...props} />)}
     </Stack>
   );
+}
+
+function Payment() {
+  return (
+    <Typography>Payment!!</Typography>
+  )
 }
