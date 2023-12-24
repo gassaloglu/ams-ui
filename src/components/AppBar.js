@@ -1,4 +1,5 @@
 import { useAuth } from '../hooks/useAuth';
+import { Link } from 'react-router-dom';
 import { AppBar as MuiAppBar, Toolbar, Typography, IconButton, Stack, Button, Divider } from '@mui/material';
 import AirlinesIcon from '@mui/icons-material/Airlines';
 
@@ -14,6 +15,8 @@ export default function AppBar() {
           edge='start'
           color='inherit'
           aria-label='logo'
+          LinkComponent={Link}
+          to='/'
         >
           <AirlinesIcon />
         </IconButton>
