@@ -1,4 +1,4 @@
-import { Button, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Stack, TextField, Typography } from '@mui/material';
+import { Button, Stack, TextField, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -6,6 +6,7 @@ import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { useContext, useState } from 'react';
 import { BookingContext } from '../routes/Booking';
 import dayjs from 'dayjs';
+import GenderSelection from './GenderSelection';
 
 const isValidName = name => (/^[a-zA-Z]{2,}[a-zA-Z ]*$/).test(name);
 const isValidId = id => (/^[1-9][0-9]{10}$/).test(id);
@@ -56,23 +57,5 @@ export default function PassengerForm() {
       </Button>
       <Typography align='center' color='error'> {errorMessage} </Typography>
     </Stack>
-  );
-}
-
-function GenderSelection({ value, onChange }) {
-  return (
-    <FormControl>
-      <FormLabel id="demo-controlled-radio-buttons-group">Gender</FormLabel>
-      <RadioGroup
-        aria-labelledby="demo-controlled-radio-buttons-group"
-        name="controlled-radio-buttons-group"
-        value={value}
-        onChange={onChange}
-        row
-      >
-        <FormControlLabel value="male" control={<Radio />} label="Male" />
-        <FormControlLabel value="female" control={<Radio />} label="Female" />
-      </RadioGroup>
-    </FormControl>
   );
 }

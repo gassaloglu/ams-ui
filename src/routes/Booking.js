@@ -32,7 +32,7 @@ const plan = chunk(chunk(randomOccupation, 3), 3);
 export function Booking() {
   const { date } = useParams();
   const flights = useLoaderData();
-  const [step, setStep] = useState(2);
+  const [step, setStep] = useState(0);
   const [booking, updateBooking] = useImmer({
     flight: {
       plan: '',

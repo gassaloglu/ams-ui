@@ -1,37 +1,55 @@
 import { useState } from 'react';
+import { useImmer } from 'use-immer';
 import { useAuth } from '../hooks/useAuth';
+import { axios } from '../index';
 
-import Stack from '@mui/material/Stack';
-import Paper from '@mui/material/Paper';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+
 import LoadingButton from '@mui/lab/LoadingButton';
-import TextField from '@mui/material/TextField';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
+import { DatePicker } from '@mui/x-date-pickers';
+import { Alert, Link, Paper, Snackbar, Stack, TextField, Typography } from '@mui/material';
+import { MuiTelInput } from 'mui-tel-input';
+import GenderSelection from './GenderSelection';
 
 export default function Signup() {
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [signupFailed, setSignupFailed] = useState(false);
   const [error, setError] = useState(false);
+  const [user, updateUser] = useImmer({
+    name: '',
+    surname: '',
+    email: '',
+    password: '',
+    phone: '',
+    gender: 1,
+    birth_date: '',
+  });
+
+  const set = user => {
+    updateUser(draft => {
+      Object.assign(draft, user);
+    });
+  };
 
   const handleClick = (_) => {
     setError(false);
     setSignupFailed(false);
     setLoading(true);
 
-    // request('/login/placeholder')
-    //   .then(res => res.json())
-    //   .then(({ token }) => {
-    //     if (token) {
-    //       login({ token });
-    //     } else {
-    //       setSignupFailed(true);
-    //     }
-    //   })
-    //   .catch(_ => setError(true))
-    //   .finally(() => setLoading(false));
+    axios.post('/register',)
+      .then(res => res.json())
+      .then(({ token }) => {
+        if (token) {
+          login({ token });
+        } else {
+          setSignupFailed(true);
+        }
+      })
+      .catch(_ => setError(true))
+      .finally(() => setLoading(false));
   }
 
   return (
@@ -45,15 +63,61 @@ export default function Signup() {
           Please fill the required information.
         </Typography>
 
-        <Stack spacing={1}>
+        <Stack spacing={1.5}>
+          <TextField
+            error={signupFailed}
+            label="Email"
+            type='email'
+            size="small"
+            value={user.email}
+            onChange={e => set({ email: e.target.value })}
+          />
+          <TextField
+            label="Password"
+            type='password'
+            size="small"
+            value={user.password}
+            onChange={e => set({ password: e.target.value })}
+          />
+
           <Stack direction='row' spacing={1}>
-            <TextField label="Name" size="small" />
-            <TextField label="Surname" size="small" />
+            <TextField
+              label="Name"
+              size="small"
+              value={user.name}
+              onChange={e => set({ name: e.target.value })}
+            />
+
+            <TextField
+              label="Surname"
+              size="small"
+              value={user.surname}
+              onChange={e => set({ surname: e.target.value })}
+            />
           </Stack>
 
-          <TextField error={signupFailed} label="Phone Number" type='tel' size="small" />
-          <TextField error={signupFailed} label="Email" type='email' size="small" />
-          <TextField label="Password" type='password' size="small" />
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              label="Birthday"
+              slotProps={{ textField: { size: 'small' } }}
+              maxDate={dayjs()}
+              onChange={b => set({ birth_date: b.format('YYYY-MM-DD') })}
+            />
+          </LocalizationProvider>
+
+          <MuiTelInput
+            size='small'
+            label="Phone number"
+            disableDropdown
+            forceCallingCode
+            defaultCountry='TR'
+            value={user.phone}
+            onChange={phone => set({ phone })}
+          />
+          <GenderSelection
+            value={user.gender}
+            onChange={gender => set({ gender })}
+          />
         </Stack>
 
         <LoadingButton
@@ -62,7 +126,7 @@ export default function Signup() {
           variant='contained'
           onClick={handleClick}
         >
-          Sing up
+          Sign up
         </LoadingButton>
 
         <Typography
