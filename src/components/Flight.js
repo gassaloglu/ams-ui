@@ -3,8 +3,20 @@ import { Accordion, AccordionSummary, AccordionDetails, Typography, Box, Stack, 
 import { ExpandMore, TrendingFlat, Luggage, FlightClass, Restaurant } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
 import { BookingContext } from '../routes/Booking';
+import dayjs from 'dayjs';
 
-export default function Flight({ from, to, departure, arrival, price }) {
+export default function Flight({ id, departure_airport, destination_airport, departure_time, arrival_time, price }) {
+  const { updateBooking, nextStep } = useContext(BookingContext);
+
+  const updateFlight = plan => {
+    updateBooking(draft => {
+      draft.flight.plan = plan;
+      draft.flight.number = id;
+    })
+
+    nextStep();
+  }
+
   return (
     <Accordion disableGutters>
       <AccordionSummary
@@ -15,13 +27,13 @@ export default function Flight({ from, to, departure, arrival, price }) {
         <Stack sx={{ p: 1, width: '100%' }} direction='row' justifyContent='space-between' alignItems='center'>
           <Stack flex={7} direction='row' justifyContent='space-between' alignItems='center'>
             <Box>
-              <Typography fontWeight='bold' color="grey.500"> {from} </Typography>
-              <Typography fontWeight='bold' variant='h5'> 08:30 </Typography>
+              <Typography fontWeight='bold' color="grey.500"> {departure_airport} </Typography>
+              <Typography fontWeight='bold' variant='h5'> {dayjs(departure_time).format('LT')} </Typography>
             </Box>
             <TrendingFlat />
             <Box>
-              <Typography fontWeight='bold' color="grey.500"> {to} </Typography>
-              <Typography fontWeight='bold' variant='h5'> 10:30 </Typography>
+              <Typography fontWeight='bold' color="grey.500"> {destination_airport} </Typography>
+              <Typography fontWeight='bold' variant='h5'> {dayjs(arrival_time).format('LT')} </Typography>
             </Box>
           </Stack>
           <Typography fontWeight='bold' flex={6} textAlign='right' variant="h5"> {price} ₺ </Typography>
@@ -30,15 +42,15 @@ export default function Flight({ from, to, departure, arrival, price }) {
 
       <AccordionDetails>
         <Stack spacing={1} sx={{ paddingBottom: 1 }} direction='row' justifyContent='space-evenly'>
-          <Plan label='essentials' dash={blue[500]} price={price}>
+          <Plan label='essentials' dash={blue[500]} price={price.toFixed(2)} onClick={() => updateFlight('essentials')}>
             <Benefit icon={<Luggage />}> 15 Kg. Luggage </Benefit>
           </Plan>
-          <Plan label='advantage' dash={green[500]} price={price + 200}>
+          <Plan label='advantage' dash={green[500]} price={(price * 1.2).toFixed(2)} onClick={() => updateFlight('advantage')}>
             <Benefit icon={<Luggage />}> 25 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}> Standard Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
           </Plan>
-          <Plan label='comfort' dash={red[500]} price={price + 400}>
+          <Plan label='comfort' dash={red[500]} price={(price * 1.2 * 1.2).toFixed(2)} onClick={() => updateFlight('comfort')}>
             <Benefit icon={<Luggage />}> 45 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}>  Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
@@ -49,9 +61,7 @@ export default function Flight({ from, to, departure, arrival, price }) {
   );
 }
 
-function Plan({ label, price, dash, children }) {
-  const { step, nextStep } = useContext(BookingContext);
-
+function Plan({ label, price, dash, children, onClick }) {
   return (
     <Paper
       sx={{
@@ -85,7 +95,7 @@ function Plan({ label, price, dash, children }) {
         <Button
           sx={{ minWidth: '190px' }}
           variant='contained'
-          onClick={nextStep}
+          onClick={onClick}
         >
           {price} ₺
         </Button>

@@ -1,22 +1,22 @@
 import { createContext, useContext, useState } from "react";
-import { chunk, isEqual } from 'underscore';
+import { useLoaderData, useParams, useRouteError } from 'react-router-dom';
+import { chunk, isEqual, select } from 'underscore';
+import { useImmer } from 'use-immer';
+import { axios } from '../index';
 
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { ArrowCircleRightOutlined, ArrowRight, Book } from '@mui/icons-material';
+import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography } from "@mui/material";
 
-import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography, TextField, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio } from "@mui/material";
-import { ArrowRight, ArrowCircleRightOutlined } from '@mui/icons-material';
-
-import { SeatPlan, SeatDescription } from '../components/Seat';
-import Page from "../components/Page";
 import Flight from '../components/Flight';
+import Page from "../components/Page";
+import PassengerForm from '../components/PassengerForm';
+import { SeatDescription, SeatPlan } from '../components/Seat';
+
+import dayjs from 'dayjs';
+import Error from '../components/Error';
+import { Center } from '../components/Styled';
 
 export const BookingContext = createContext({});
-
-const fiftyfifty = () => Math.random() > 0.5;
-const randomOccupation = Array(99).fill(false).map(fiftyfifty);
-const plan = chunk(chunk(randomOccupation, 3), 3);
 
 const steps = [
   <Flights />,
@@ -25,18 +25,41 @@ const steps = [
   <Payment />
 ];
 
-export default function Booking() {
-  const [step, setStep] = useState(0);
+const fiftyfifty = () => Math.random() > 0.5;
+const randomOccupation = Array(99).fill(false).map(fiftyfifty);
+const plan = chunk(chunk(randomOccupation, 3), 3);
+
+export function Booking() {
+  const { date } = useParams();
+  const flights = useLoaderData();
+  const [step, setStep] = useState(2);
+  const [booking, updateBooking] = useImmer({
+    flight: {
+      plan: '',
+      number: '',
+    },
+    passenger: {
+      name: '',
+      surname: '',
+      birth: null,
+      id: '',
+      phone: '',
+      male: true,
+      disabled: false,
+      child: false,
+    },
+    seat: {},
+  });
 
   const nextStep = () => setStep(step + 1)
-  const context = { step, setStep, nextStep };
+  const context = { step, setStep, nextStep, flights, booking, updateBooking };
 
   return (
     <BookingContext.Provider value={context}>
       <Page>
         <Box padding={2} display='flex' justifyContent='center'>
           <Stack sx={{ width: '900px' }} spacing={3} alignItems='stretch'>
-            <Details />
+            <Details date={date} />
             <Steps />
             <Stack alignItems='center'>
               {steps[step]}
@@ -48,9 +71,39 @@ export default function Booking() {
   );
 }
 
+export function BookingErrorBoundary() {
+  const error = useRouteError();
+
+  return (
+    <Page>
+      <Center>
+        {
+          error.response
+            ? <Error title="No flights available">There are no flights available matching your criteria.</Error>
+            : <Error title="Something went wrong">It appears that a network error has occurred.</Error>
+        }
+      </Center >
+    </Page>
+  );
+
+}
+
+export async function bookingLoader({ params: { from, to, date } }) {
+  const response = await axios.get(`/flight/${from}/${to}/${date}`);
+  return response.data;
+}
+
 function SeatSelection() {
-  const { step, setStep } = useContext(BookingContext);
+  const { nextStep, updateBooking } = useContext(BookingContext);
   const [selectedSeat, setSelectedSeat] = useState(null);
+
+  const handleSubmit = () => {
+    updateBooking(draft => {
+      draft.seat = selectedSeat;
+    });
+
+    nextStep();
+  }
 
   return (
     <>
@@ -65,7 +118,7 @@ function SeatSelection() {
           disabled={selectedSeat === null}
           variant='contained'
           endIcon={<ArrowRight />}
-          onClick={() => setStep(step + 1)}
+          onClick={handleSubmit}
         >
           Continue
         </Button>
@@ -73,48 +126,6 @@ function SeatSelection() {
 
       <SeatPlan plan={plan} isSelected={seat => isEqual(seat, selectedSeat)} onSelect={setSelectedSeat} />
     </>
-  );
-}
-
-function PassengerForm() {
-  const { step, setStep } = useContext(BookingContext);
-
-  return (
-    <Stack spacing={1} sx={{ m: 'auto', maxWidth: '300px' }}>
-      <TextField label="Name" />
-      <TextField label="Surname" />
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker />
-      </LocalizationProvider>
-      <TextField label="Turkish ID Number" />
-      <TextField label="Phone number" />
-      <GenderSelection value='female' onChange={() => { }} />
-      <Button
-        size='large'
-        variant='contained'
-        onClick={() => setStep(step + 1)}
-      >
-        Submit
-      </Button>
-    </Stack>
-  );
-}
-
-function GenderSelection({ value, onChange }) {
-  return (
-    <FormControl>
-      <FormLabel id="demo-controlled-radio-buttons-group">Gender</FormLabel>
-      <RadioGroup
-        aria-labelledby="demo-controlled-radio-buttons-group"
-        name="controlled-radio-buttons-group"
-        value={value}
-        onChange={onChange}
-        row
-      >
-        <FormControlLabel value="female" control={<Radio />} label="Female" />
-        <FormControlLabel value="male" control={<Radio />} label="Male" />
-      </RadioGroup>
-    </FormControl>
   );
 }
 
@@ -147,7 +158,7 @@ function Steps() {
   )
 }
 
-function Details() {
+function Details({ date }) {
   return (
     <Box sx={{ p: 3, }}>
       <Stack
@@ -164,32 +175,29 @@ function Details() {
         </Stack>
 
         <Typography>
-          <strong> Departure flight:</strong>
-          14 Dec 2023, Thu
+          <strong> Departure flight: </strong>
+          {dayjs(date).format('ddd, MMM D, YYYY')}
         </Typography>
       </Stack>
     </Box>
   );
 }
 
-const flights = [
-  { id: 0, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
-  { id: 1, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
-  { id: 2, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
-  { id: 3, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
-  { id: 4, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
-  { id: 5, from: 'ADA', to: 'ADB', departure: new Date(), arrival: new Date(), price: 1092.49 },
-]
+function Flights() {
+  const { flights } = useContext(BookingContext);
 
-function Flights({ onSelect }) {
   return (
     <Stack spacing={0}>
-      {flights.map(({ id, ...props }) => <Flight key={id} {...props} />)}
+      {flights.map(props => <Flight key={props.id} {...props} />)}
     </Stack>
   );
 }
 
 function Payment() {
+  const { booking } = useContext(BookingContext);
+
+  console.log(booking);
+
   return (
     <Typography>Payment!!</Typography>
   )

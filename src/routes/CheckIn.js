@@ -20,7 +20,7 @@ export function CheckIn() {
   );
 }
 
-export function CheckInError() {
+export function CheckInErrorBoundary() {
   const error = useRouteError();
 
   return (
@@ -29,7 +29,7 @@ export function CheckInError() {
         {
           error.response
             ? <Error title="Not found">No records found matching your PNR and surname.</Error>
-            : <Error title="Something went wrong">It appears that a network has error occurred.</Error>
+            : <Error title="Something went wrong">It appears that a network error has occurred.</Error>
         }
       </Center >
     </Page>
