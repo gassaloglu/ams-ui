@@ -24,6 +24,7 @@ import './styles/index.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 export const axios = Axios.create({
+  headers: { Authorization: 'Bearer 123123123' },
   baseURL: "http://localhost:5500",
 });
 

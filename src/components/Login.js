@@ -16,10 +16,10 @@ import Link from '@mui/material/Link';
 export default function Login() {
   const { login } = useAuth();
 
-  const [isEmployee, setIsEmployee] = useState(false);
-  const [number, setNumber] = useState('');
+  const [nationalId, setNationalId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [is_employee, setIsEmployee] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [authFailed, setAuthFailed] = useState(false);
@@ -30,15 +30,18 @@ export default function Login() {
     setAuthFailed(false);
     setLoading(true);
 
-    axios.post('/login', { email, password })
-      .then(response => {
-        login({ token: response.data.token });
+    const key = is_employee ? nationalId : email;
+
+    axios.post('/login', { is_employee, key, password })
+      .then(({ data: { token } }) => {
+        login({ token, is_employee });
       })
       .catch(error => {
         if (error.response) {
           setAuthFailed(true)
         } else {
           setError(true)
+          console.log(error);
         }
       })
       .finally(() => setLoading(false));
@@ -56,13 +59,13 @@ export default function Login() {
         </Typography>
 
         {
-          isEmployee
+          is_employee
             ? <TextField
               error={authFailed}
-              label="Personnel number"
+              label="National id"
               size="small"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
+              value={nationalId}
+              onChange={(e) => setNationalId(e.target.value)}
             />
             : <TextField
               error={authFailed}
@@ -89,7 +92,7 @@ export default function Login() {
           color="primary"
           size='small'
           fullWidth
-          value={isEmployee ? 'employee' : 'user'}
+          value={is_employee ? 'employee' : 'user'}
           onChange={(e, v) => setIsEmployee(v === 'employee')}
         >
           <ToggleButton value="user">User</ToggleButton>

@@ -39,16 +39,17 @@ export default function Signup() {
     setSignupFailed(false);
     setLoading(true);
 
-    axios.post('/register',)
-      .then(res => res.json())
-      .then(({ token }) => {
-        if (token) {
-          login({ token });
-        } else {
+    axios.post('/register', user)
+      .then(({ data: { token } }) => {
+        login({ token, is_employee: false });
+      })
+      .catch(error => {
+        if (error.response) {
           setSignupFailed(true);
+        } else {
+          setError(true);
         }
       })
-      .catch(_ => setError(true))
       .finally(() => setLoading(false));
   }
 
