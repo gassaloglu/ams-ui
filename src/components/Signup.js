@@ -24,7 +24,7 @@ export default function Signup() {
     email: '',
     password: '',
     phone: '',
-    gender: 1,
+    gender: "Male",
     birth_date: '',
   });
 

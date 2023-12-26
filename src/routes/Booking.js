@@ -34,21 +34,18 @@ export function Booking() {
   const flights = useLoaderData();
   const [step, setStep] = useState(0);
   const [booking, updateBooking] = useImmer({
-    flight: {
-      plan: '',
-      number: '',
-    },
-    passenger: {
-      name: '',
-      surname: '',
-      birth: null,
-      id: '',
-      phone: '',
-      male: true,
-      disabled: false,
-      child: false,
-    },
-    seat: {},
+    flight_number: '',
+    ticket_type: '',
+    national_id: '',
+    seat: '',
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    gender: '',
+    birth_date: '',
+    disabled: '',
+    child: '',
   });
 
   const nextStep = () => setStep(step + 1)
