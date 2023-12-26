@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { json, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { axios } from '../index';
 
 const AuthContext = createContext();
 
@@ -11,12 +12,14 @@ export function AuthProvider({ children }) {
   const login = async user => {
     setUser(user);
     localStorage.setItem('user', JSON.stringify(user));
+    axios.defaults.headers = { Authorization: `Bearer ${user.token}` };
     navigate("/", { replace: true });
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    axios.defaults.headers = {};
     navigate("/", { replace: true });
   };
 

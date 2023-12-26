@@ -23,8 +23,9 @@ import './styles/index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+const user = JSON.parse(localStorage.getItem('user'));
 export const axios = Axios.create({
-  headers: { Authorization: 'Bearer 123123123' },
+  headers: user ? { Authorization: `Bearer ${user.token}` } : {},
   baseURL: "http://localhost:5500",
 });
 
