@@ -1,11 +1,12 @@
 import { useAuth } from "../hooks/useAuth";
-import { useOutlet, Navigate } from "react-router-dom";
+import { useOutlet, Navigate, useLocation } from "react-router-dom";
 
 export default function Protected({ Layout }) {
   const { user } = useAuth();
   const outlet = useOutlet();
+  const location = useLocation();
 
-  if (!user) return <Navigate to="/login" />;
+  if (!user) return <Navigate to="/login" state={{ redirect: location.pathname }} replace />;
 
   return <Layout outlet={outlet} />
 }

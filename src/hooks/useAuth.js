@@ -13,7 +13,6 @@ export function AuthProvider({ children }) {
     setUser(user);
     localStorage.setItem('user', JSON.stringify(user));
     axios.defaults.headers = { Authorization: `Bearer ${user.token}` };
-    navigate("/", { replace: true });
   };
 
   const logout = () => {

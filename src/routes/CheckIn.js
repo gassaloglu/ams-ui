@@ -2,7 +2,6 @@ import { useLoaderData, useRouteError } from 'react-router-dom';
 import { axios } from '../index';
 import dayjs from 'dayjs';
 
-import AppBar from '../components/AppBar';
 import { Center } from '../components/Styled';
 import Error from '../components/Error';
 import Page from '../components/Page';

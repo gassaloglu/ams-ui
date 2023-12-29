@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { axios } from '../index';
 import { useAuth } from '../hooks/useAuth';
 
@@ -15,6 +16,8 @@ import Link from '@mui/material/Link';
 
 export default function Login() {
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [nationalId, setNationalId] = useState('');
   const [email, setEmail] = useState('');
@@ -35,13 +38,18 @@ export default function Login() {
     axios.post('/login', { is_employee, key, password })
       .then(({ data: { token } }) => {
         login({ token, is_employee });
+
+        if (location.state?.redirect) {
+          navigate(location.state.redirect, { replace: true });
+        } else {
+          navigate('/', { replace: true });
+        }
       })
       .catch(error => {
         if (error.response) {
           setAuthFailed(true)
         } else {
           setError(true)
-          console.log(error);
         }
       })
       .finally(() => setLoading(false));

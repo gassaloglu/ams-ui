@@ -1,21 +1,17 @@
-import { useContext } from 'react';
-import { Accordion, AccordionSummary, AccordionDetails, Typography, Box, Stack, Paper, Button } from '@mui/material';
-import { ExpandMore, TrendingFlat, Luggage, FlightClass, Restaurant } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { Accordion, AccordionSummary, AccordionDetails, Typography, Box, Stack, Paper, Button, Divider } from '@mui/material';
+import { ExpandMore, TrendingFlat, Luggage, FlightClass, Restaurant, ArrowCircleRightOutlined } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
-import { BookingContext } from '../routes/Booking';
 import dayjs from 'dayjs';
 
-export default function Flight({ id, departure_airport, destination_airport, departure_time, arrival_time, price }) {
-  const { updateBooking, nextStep } = useContext(BookingContext);
+export function Flight({ flight_number, departure_airport, destination_airport, departure_time, arrival_time, price }) {
+  const navigate = useNavigate();
 
-  const updateFlight = plan => {
-    updateBooking(draft => {
-      draft.flight.plan = plan;
-      draft.flight.number = id;
-    })
-
-    nextStep();
+  const handleClick = plan => {
+    navigate(`/booking/${flight_number}/${plan}`);
   }
+
+  price = parseFloat(price);
 
   return (
     <Accordion disableGutters>
@@ -42,15 +38,15 @@ export default function Flight({ id, departure_airport, destination_airport, dep
 
       <AccordionDetails>
         <Stack spacing={1} sx={{ paddingBottom: 1 }} direction='row' justifyContent='space-evenly'>
-          <Plan label='essentials' dash={blue[500]} price={price.toFixed(2)} onClick={() => updateFlight('essentials')}>
+          <Plan label='essentials' dash={blue[500]} price={price.toFixed(2)} onClick={() => handleClick('Essentials')}>
             <Benefit icon={<Luggage />}> 15 Kg. Luggage </Benefit>
           </Plan>
-          <Plan label='advantage' dash={green[500]} price={(price * 1.2).toFixed(2)} onClick={() => updateFlight('advantage')}>
+          <Plan label='advantage' dash={green[500]} price={(price * 1.2).toFixed(2)} onClick={() => handleClick('Advantage')}>
             <Benefit icon={<Luggage />}> 25 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}> Standard Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
           </Plan>
-          <Plan label='comfort' dash={red[500]} price={(price * 1.2 * 1.2).toFixed(2)} onClick={() => updateFlight('comfort')}>
+          <Plan label='comfort' dash={red[500]} price={(price * 1.2 * 1.2).toFixed(2)} onClick={() => handleClick('comfort')}>
             <Benefit icon={<Luggage />}> 45 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}>  Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
@@ -58,6 +54,31 @@ export default function Flight({ id, departure_airport, destination_airport, dep
         </Stack>
       </AccordionDetails>
     </Accordion >
+  );
+}
+
+export function FlightDetails({ from, to, date }) {
+  return (
+    <Box sx={{ p: 3, }}>
+      <Stack
+        spacing={2}
+        direction='row'
+        justifyContent='center'
+        alignItems='center'
+        divider={<Divider orientation="vertical" flexItem />}
+      >
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <Typography fontWeight='bold' variant='h4'> {from} </Typography>
+          <ArrowCircleRightOutlined sx={{ color: 'grey.500' }} />
+          <Typography fontWeight='bold' variant='h4'> {to} </Typography>
+        </Stack>
+
+        <Typography>
+          <strong> Departure flight: </strong>
+          {dayjs(date).format('ddd, MMM D, YYYY')}
+        </Typography>
+      </Stack>
+    </Box>
   );
 }
 

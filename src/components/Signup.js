@@ -11,9 +11,11 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { DatePicker } from '@mui/x-date-pickers';
 import { Alert, Link, Paper, Snackbar, Stack, TextField, Typography } from '@mui/material';
 import { MuiTelInput } from 'mui-tel-input';
-import GenderSelection from './GenderSelection';
+import { GenderSelection } from './Selection';
+import { useNavigate } from 'react-router-dom';
 
 export default function Signup() {
+  const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
   const [signupFailed, setSignupFailed] = useState(false);
@@ -42,6 +44,7 @@ export default function Signup() {
     axios.post('/register', user)
       .then(({ data: { token } }) => {
         login({ token, is_employee: false });
+        navigate('/');
       })
       .catch(error => {
         if (error.response) {

@@ -6,15 +6,16 @@ import { MuiTelInput, matchIsValidTel } from 'mui-tel-input';
 import { useContext, useState } from 'react';
 import { BookingContext } from '../routes/Booking';
 import dayjs from 'dayjs';
-import GenderSelection from './GenderSelection';
+import { GenderSelection, DisabledSelection } from './Selection';
 
 const isValidName = name => (/^[a-zA-Z]{2,}[a-zA-Z ]*$/).test(name);
 const isValidId = id => (/^[1-9][0-9]{10}$/).test(id);
+const isValidEmail = email => (/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/).test(email);
 
 export default function PassengerForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const { nextStep, booking, updateBooking } = useContext(BookingContext);
-  const { name, surname, id, phone, gender, birth, male, disabled, child } = booking.passenger;
+  const { name, surname, national_id, phone, email, gender, birth, disabled } = booking;
 
   const handleSubmit = () => {
     if (!isValidName(name)) {
@@ -23,8 +24,10 @@ export default function PassengerForm() {
       setErrorMessage('Please enter a valid surname.')
     } else if (!birth) {
       setErrorMessage('Please enter your birthday.')
-    } else if (!isValidId(id)) {
+    } else if (!isValidId(national_id)) {
       setErrorMessage('Please enter a valid id.')
+    } else if (!isValidEmail(email)) {
+      setErrorMessage('Please enter a valid email.')
     } else if (!matchIsValidTel(phone)) {
       setErrorMessage('Please enter a phone number.')
     } else {
@@ -34,7 +37,7 @@ export default function PassengerForm() {
 
   const updatePassenger = (passenger) => {
     updateBooking(draft => {
-      Object.assign(draft.passenger, passenger);
+      Object.assign(draft, passenger);
     });
   }
 
@@ -45,9 +48,11 @@ export default function PassengerForm() {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker maxDate={dayjs()} value={birth} onChange={b => updatePassenger({ birth: b })} />
       </LocalizationProvider>
-      <TextField label="Turkish ID Number" inputProps={{ maxLength: 11 }} value={id} onChange={(e) => updatePassenger({ id: e.target.value })} />
+      <TextField label="Turkish ID Number" inputProps={{ maxLength: 11 }} value={national_id} onChange={(e) => updatePassenger({ national_id: e.target.value })} />
+      <TextField label="Email" type='email' value={email} onChange={(e) => updatePassenger({ email: e.target.value })} />
       <MuiTelInput label="Phone number" disableDropdown forceCallingCode defaultCountry='TR' value={phone} onChange={phone => updatePassenger({ phone })} />
-      <GenderSelection value={male ? 'male' : 'female'} onChange={e => updatePassenger({ male: e.target.value === 'male' })} />
+      <GenderSelection value={gender} onChange={gender => updatePassenger({ gender })} />
+      <DisabledSelection value={disabled} onChange={disabled => updatePassenger({ disabled })} />
       <Button
         size='large'
         variant='contained'

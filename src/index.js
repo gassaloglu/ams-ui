@@ -14,6 +14,7 @@ import Signup from './routes/Signup';
 import Profile from './routes/Profile';
 import { Booking, BookingErrorBoundary, bookingLoader } from './routes/Booking';
 import { CheckIn, CheckInErrorBoundary, checkInLoader } from './routes/CheckIn';
+import { Flights, FlightsErrorBoundary, flightsLoader } from './routes/Flights';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -53,9 +54,15 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: "/booking/:from/:to/:date",
+        path: "/flights/:from/:to/:date",
+        loader: flightsLoader,
+        element: <Flights />,
+        errorElement: <FlightsErrorBoundary />,
+      },
+      {
+        path: "/booking/:flight_number/:plan",
         loader: bookingLoader,
-        element: <Booking />,
+        element: <Protected Layout={Booking} />,
         errorElement: <BookingErrorBoundary />,
       },
       {
