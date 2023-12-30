@@ -7,6 +7,7 @@ import TabPanel from '@mui/lab/TabPanel'
 
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import Box from '@mui/material/Box';
 
 import Stack from '@mui/material/Stack';
 
@@ -18,6 +19,8 @@ import dayjs from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+
+import airports from "../airports.json"
 
 export default function Booker() {
   const [activeTab, setActiveTab] = useState('1');
@@ -89,9 +92,6 @@ function FlightsTab() {
   );
 }
 
-// TODO: Fetch these from database.
-const airports = ['Izmir', 'Istanbul', 'Ankara', 'Adana']
-
 function AirportSelection({ label, airport, setAirport, disabledAirport }) {
   return (
     <Autocomplete
@@ -99,6 +99,12 @@ function AirportSelection({ label, airport, setAirport, disabledAirport }) {
       value={airport}
       onChange={(event, value) => setAirport(value)}
       options={airports}
+      getOptionLabel={(option) => option.iata}
+      renderOption={(props, option) => (
+        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+          {option.name}
+        </Box>
+      )}
       getOptionDisabled={airport => airport === disabledAirport}
       sx={{ width: 150 }}
       renderInput={params => <TextField {...params} label={label} />}
