@@ -1,0 +1,78 @@
+{
+    "JFK": {
+        "name": "John F Kennedy International Airport",
+        "city": "New York"
+    },
+    "LHR": {
+        "name": "Heathrow Airport",
+        "city": "London"
+    },
+    "ADB": {
+        "name": "Adnan Menderes International Airport",
+        "city": "Izmir"
+    },
+    "CDG": {
+        "name": "Charles de Gaulle International Airport",
+        "city": "Paris"
+    },
+    "FRA": {
+        "name": "Frankfurt am Main International Airport",
+        "city": "Frankfurt"
+    },
+    "AMS": {
+        "name": "Amsterdam Airport Schiphol",
+        "city": "Amsterdam"
+    },
+    "IST": {
+        "name": "İstanbul Airport",
+        "city": "Istanbul"
+    },
+    "ESB": {
+        "name": "Esenboga Airport",
+        "city": "Ankara"
+    },
+    "SFO": {
+        "name": "San Francisco International Airport",
+        "city": "San Francisco"
+    },
+    "LAX": {
+        "name": "Los Angeles International Airport",
+        "city": "Los Angeles"
+    },
+    "ATL": {
+        "name": "Hartsfield-Jackson Atlanta International",
+        "city": "Atalanta"
+    },
+    "PEK": {
+        "name": "Beijing Capital International Airport",
+        "city": "Beijing"
+    },
+    "ORD": {
+        "name": "Chicago O'Hare Airport",
+        "city": "Chicago"
+    },
+    "HND": {
+        "name": "Haneda Airport",
+        "city": "Tokyo"
+    },
+    "ADA": {
+        "name": "Adana Airport",
+        "city": "Adana"
+    },
+    "DXB": {
+        "name": "Dubai International Airport",
+        "city": "Dubai"
+    },
+    "SIN": {
+        "name": "Singapore Changi International Airport",
+        "city": "Dubai"
+    },
+    "FCO": {
+        "name": "Leonardo da Vinci-Fiumicino Airport",
+        "city": "Rome"
+    },
+    "SYD": {
+        "name": "Sydney Airport",
+        "city": "Sydney"
+    }
+}
