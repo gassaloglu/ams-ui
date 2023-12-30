@@ -6,6 +6,8 @@ import { Center } from '../components/Styled';
 import Error from '../components/Error';
 import Page from '../components/Page';
 import { Divider, Paper, Grid, Stack, Typography } from '@mui/material';
+import { getPrice } from '../components/Flight';
+import { indexToAlphaIndex } from '../components/Seat';
 
 export function CheckIn() {
   const { checkin, flight } = useLoaderData();
@@ -109,7 +111,7 @@ function CheckInData({ checkin, flight }) {
             <Info label="Fare type"> {checkin.fare_type} </Info>
           </Grid>
           <Grid item xs={3}>
-            <Info label="Seat number"> {checkin.seat} </Info>
+            <Info label="Seat number"> {indexToAlphaIndex(checkin.seat)} </Info>
           </Grid>
           <Grid item xs={3}>
             <Info label="Luggage number"> {checkin.luggage_id} </Info>
@@ -127,7 +129,7 @@ function CheckInData({ checkin, flight }) {
             <Info label="Child"> {question(checkin.child)} </Info>
           </Grid>
           <Grid item xs={3}>
-            <Info label="Price"> {flight.price} </Info>
+            <Info label="Price"> {getPrice(flight.price, checkin.fare_type)} </Info>
           </Grid>
         </Grid>
       </Stack>

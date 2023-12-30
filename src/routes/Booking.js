@@ -1,20 +1,24 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { useLoaderData, useRouteError } from 'react-router-dom';
 import { chunk, isEqual } from 'underscore';
 import { useImmer } from 'use-immer';
 import { axios } from '../index';
+import dayjs from "dayjs";
 
-import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography } from "@mui/material";
-import { ArrowRight } from '@mui/icons-material';
+import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography, Grid } from "@mui/material";
+import { ArrowRight, ErrorOutline, CheckCircleOutline, WarningAmber } from '@mui/icons-material';
 
 import Page from "../components/Page";
 import PassengerForm from '../components/PassengerForm';
-import { SeatDescription, SeatPlan } from '../components/Seat';
+import { SeatDescription, SeatPlan, seatToAlphaIndex, seatToIndex } from '../components/Seat';
 import Error from '../components/Error';
 import { Center } from '../components/Styled';
-import { FlightDetails } from "../components/Flight";
+import { FlightDetails, getPrice } from "../components/Flight";
+import { LoadingButton } from "@mui/lab";
 
 export const BookingContext = createContext({});
+
+const NUMBER_OF_SEATS = 270;
 
 const steps = [
   <PassengerForm />,
@@ -22,29 +26,32 @@ const steps = [
   <Payment />
 ];
 
-const fiftyfifty = () => Math.random() > 0.5;
-const randomOccupation = Array(99).fill(false).map(fiftyfifty);
-const plan = chunk(chunk(randomOccupation, 3), 3);
-
 export function Booking() {
-  const { flight, seats, plan } = useLoaderData();
+  const { flight, occupation, plan } = useLoaderData();
   const [step, setStep] = useState(0);
   const [booking, updateBooking] = useImmer({
-    flight_number: '',
-    ticket_type: '',
+    flight_number: flight.flight_number,
+    ticket_type: plan,
     national_id: '',
-    seat: '',
     name: '',
     surname: '',
     email: '',
     phone: '',
     gender: 'Male',
-    birth_date: '',
     disabled: 0,
+    seat: null,
+    birth_date: null,
   });
 
   const nextStep = () => setStep(step + 1)
-  const context = { step, setStep, nextStep, flight, booking, updateBooking };
+
+  const seats = useMemo(() => {
+    const seats = Array(NUMBER_OF_SEATS).fill(false);
+    occupation.forEach(seat => seats[seat] = true);
+    return chunk(chunk(seats, 3), 3);
+  }, [occupation]);
+
+  const context = { step, setStep, nextStep, booking, updateBooking, seats, flight };
 
   return (
     <BookingContext.Provider value={context}>
@@ -77,7 +84,7 @@ export function BookingErrorBoundary() {
       <Center>
         {
           error.response
-            ? <Error title="Invalid parameters">A scheduled flight can not be found or your ticket type is invalid.</Error>
+            ? <Error title="Flight not found">A scheduled flight can not be found or your ticket type is invalid.</Error>
             : <Error title="Something went wrong">It appears that a network error has occurred.</Error>
         }
       </Center >
@@ -86,7 +93,7 @@ export function BookingErrorBoundary() {
 }
 
 export async function bookingLoader({ params: { flight_number, plan } }) {
-  const [{ data: [flight] }, { data: seats }] = await Promise.all([
+  const [{ data: [flight] }, { data: occupation }] = await Promise.all([
     axios.get(`/flight/${flight_number}`),
     axios.get(`/flight/seats?id=${flight_number}`),
   ]);
@@ -94,11 +101,11 @@ export async function bookingLoader({ params: { flight_number, plan } }) {
   if (!["Essentials", "Advantage", "comfort"].includes(plan))
     throw new Error(`Invalid ticket type "${plan}"`);
 
-  return { flight, seats, plan };
+  return { flight, occupation, plan };
 }
 
 function SeatSelection() {
-  const { nextStep, updateBooking } = useContext(BookingContext);
+  const { nextStep, updateBooking, seats } = useContext(BookingContext);
   const [selectedSeat, setSelectedSeat] = useState(null);
 
   const handleSubmit = () => {
@@ -117,6 +124,7 @@ function SeatSelection() {
           <SeatDescription variant="vacant" label="Vacant" />
           <SeatDescription variant="selected" label="Selected" />
         </Stack>
+
         <Button
           sx={{ width: '150px' }}
           disabled={selectedSeat === null}
@@ -128,7 +136,11 @@ function SeatSelection() {
         </Button>
       </Stack>
 
-      <SeatPlan plan={plan} isSelected={seat => isEqual(seat, selectedSeat)} onSelect={setSelectedSeat} />
+      <SeatPlan
+        plan={seats}
+        isSelected={seat => isEqual(seat, selectedSeat)}
+        onSelect={setSelectedSeat}
+      />
     </>
   );
 }
@@ -157,10 +169,124 @@ function Steps() {
   )
 }
 
-function Payment() {
-  const { booking } = useContext(BookingContext);
+const Detail = ({ label, children }) =>
+  <Typography> <strong>{label}</strong>: {children}</Typography>;
 
-  return (
-    <Typography>Payment!!</Typography>
-  )
+const Status = ({ Icon, children }) => (
+  <Stack sx={{ minHeight: '200px' }} alignItems='center'>
+    <Icon sx={{ fontSize: '100px', color: 'grey.500', mb: 1 }} />
+    {children}
+  </Stack>
+);
+
+function Payment() {
+  const { booking, flight } = useContext(BookingContext);
+
+  const [pnr, setPnr] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [failMessage, setFailMessage] = useState('');
+
+  const handleClick = () => {
+    const payload = {
+      ...booking,
+      birth_date: dayjs(booking.birth_date).format("YYYY-MM-DD"),
+      seat: seatToIndex(booking.seat).toString(),
+      child: Number(dayjs().diff(booking.birth_date, 'year', true) < 10).toString(),
+      disabled: booking.disabled.toString(),
+    }
+
+    setLoading(true);
+
+    axios.post('/ticket/payment', payload)
+      .then(({ data: { pnr } }) => {
+        setPnr(pnr);
+        setStatus('success');
+      })
+      .catch(error => {
+        if (error.response) {
+          setStatus('fail');
+          setFailMessage(error.response.data);
+        } else {
+          setStatus('error');
+        }
+      })
+      .finally(() => setLoading(false));
+  }
+
+  if (status) {
+    return (
+      <Box>
+        {
+          status === "fail" &&
+          <Status Icon={ErrorOutline}>
+            <Typography>
+              Payment failed.
+            </Typography>
+            <Typography variant='caption'>
+              Status: {failMessage}
+            </Typography>
+          </Status>
+        }
+
+        {
+          status === "error" &&
+          <Status Icon={WarningAmber}>
+            <Typography>
+              Something went wrong.
+            </Typography>
+          </Status>
+        }
+
+        {
+          status === "success" &&
+          <Status Icon={CheckCircleOutline}>
+            <Typography>
+              Your reservation number is: <strong> {pnr} </strong>
+            </Typography>
+            <Button sx={{ mt: 1 }} href={`/checkin/${pnr}/${booking.surname}`} variant="contained">
+              See check-in details
+            </Button>
+          </Status>
+        }
+      </Box>
+    );
+  } else {
+    return (
+      <Stack alignSelf='stretch' spacing={4} alignItems='center'>
+        <Typography fontWeight='bold' variant='h5'>
+          Overview of your booking details
+        </Typography>
+
+        <Stack alignSelf='stretch' direction='row' justifyContent='space-evenly' >
+          <Box>
+            <Typography variant='h6'> Passenger </Typography>
+            <Divider sx={{ my: .5 }} />
+            <Detail label="Fullname">{booking.name + " " + booking.surname}</Detail>
+            <Detail label="National ID">{booking.national_id}</Detail>
+            <Detail label="Phone">{booking.phone}</Detail>
+            <Detail label="Email">{booking.email}</Detail>
+            <Detail label="Disabled">{booking.disabled ? "Yes" : "No"}</Detail>
+          </Box>
+          <Box>
+            <Typography variant='h6'> Flight </Typography>
+            <Divider sx={{ my: .5 }} />
+            <Detail label="From">{flight.departure_airport}</Detail>
+            <Detail label="To">{flight.destination_airport}</Detail>
+            <Detail label="Date">{dayjs(flight.departure_time).format("L LT")}</Detail>
+            <Detail label="Ticket type">{booking.ticket_type}</Detail>
+            <Detail label="Seat">{seatToAlphaIndex(booking.seat)}</Detail>
+          </Box>
+        </Stack>
+
+        <Typography variant='h6'>
+          Total price: {getPrice(flight.price, booking.ticket_type)} ₺
+        </Typography>
+
+        <LoadingButton loading={loading} variant="contained" onClick={handleClick}>
+          Purchase
+        </LoadingButton>
+      </Stack>
+    );
+  }
 }
