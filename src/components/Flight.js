@@ -1,8 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { Accordion, AccordionSummary, AccordionDetails, Typography, Box, Stack, Paper, Button, Divider } from '@mui/material';
-import { ExpandMore, TrendingFlat, Luggage, FlightClass, Restaurant, ArrowCircleRightOutlined } from '@mui/icons-material';
+import { ExpandMore, TrendingFlat, Luggage, FlightClass, Restaurant, ArrowCircleRightOutlined, PriceChange } from '@mui/icons-material';
 import { red, green, blue } from '@mui/material/colors';
 import dayjs from 'dayjs';
+
+const PRICE_CONSTANT = 1.2;
+
+export const getPrice = (basePrice, ticketType) => {
+  switch (ticketType) {
+    case 'Essentials':
+      return parseFloat(basePrice).toFixed(2);
+    case 'Advantage':
+      return (parseFloat(basePrice) * PRICE_CONSTANT).toFixed(2);
+    case 'comfort':
+      return (parseFloat(basePrice) * PRICE_CONSTANT * PRICE_CONSTANT).toFixed(2);
+  }
+}
 
 export function Flight({ flight_number, departure_airport, destination_airport, departure_time, arrival_time, price }) {
   const navigate = useNavigate();
@@ -10,8 +23,6 @@ export function Flight({ flight_number, departure_airport, destination_airport, 
   const handleClick = plan => {
     navigate(`/booking/${flight_number}/${plan}`);
   }
-
-  price = parseFloat(price);
 
   return (
     <Accordion disableGutters>
@@ -38,15 +49,15 @@ export function Flight({ flight_number, departure_airport, destination_airport, 
 
       <AccordionDetails>
         <Stack spacing={1} sx={{ paddingBottom: 1 }} direction='row' justifyContent='space-evenly'>
-          <Plan label='essentials' dash={blue[500]} price={price.toFixed(2)} onClick={() => handleClick('Essentials')}>
+          <Plan label='essentials' dash={blue[500]} price={getPrice(price, 'Essentials')} onClick={() => handleClick('Essentials')}>
             <Benefit icon={<Luggage />}> 15 Kg. Luggage </Benefit>
           </Plan>
-          <Plan label='advantage' dash={green[500]} price={(price * 1.2).toFixed(2)} onClick={() => handleClick('Advantage')}>
+          <Plan label='advantage' dash={green[500]} price={getPrice(price, 'Advantage')} onClick={() => handleClick('Advantage')}>
             <Benefit icon={<Luggage />}> 25 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}> Standard Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
           </Plan>
-          <Plan label='comfort' dash={red[500]} price={(price * 1.2 * 1.2).toFixed(2)} onClick={() => handleClick('comfort')}>
+          <Plan label='comfort' dash={red[500]} price={getPrice(price, 'comfort')} onClick={() => handleClick('comfort')}>
             <Benefit icon={<Luggage />}> 45 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}>  Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>

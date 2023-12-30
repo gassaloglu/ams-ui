@@ -21,7 +21,7 @@ export default function AppBar() {
           <AirlinesIcon />
         </IconButton>
         <Typography variant='h6' sx={{ flexGrow: 1 }}>
-          AIRLINES COMPANY
+          AIRLINE COMPANY
         </Typography>
 
         <Stack

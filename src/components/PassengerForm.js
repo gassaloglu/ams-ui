@@ -15,14 +15,14 @@ const isValidEmail = email => (/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
 export default function PassengerForm() {
   const [errorMessage, setErrorMessage] = useState('');
   const { nextStep, booking, updateBooking } = useContext(BookingContext);
-  const { name, surname, national_id, phone, email, gender, birth, disabled } = booking;
+  const { name, surname, national_id, phone, email, gender, birth_date, disabled } = booking;
 
   const handleSubmit = () => {
     if (!isValidName(name)) {
       setErrorMessage('Please enter a valid name.')
     } else if (!isValidName(surname)) {
       setErrorMessage('Please enter a valid surname.')
-    } else if (!birth) {
+    } else if (!birth_date) {
       setErrorMessage('Please enter your birthday.')
     } else if (!isValidId(national_id)) {
       setErrorMessage('Please enter a valid id.')
@@ -46,7 +46,13 @@ export default function PassengerForm() {
       <TextField label="Name" value={name} onChange={(e) => updatePassenger({ name: e.target.value })} />
       <TextField label="Surname" value={surname} onChange={(e) => updatePassenger({ surname: e.target.value })} />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DatePicker maxDate={dayjs()} value={birth} onChange={b => updatePassenger({ birth: b })} />
+        <DatePicker
+          maxDate={dayjs()}
+          value={birth_date}
+          onChange={birth_date => updatePassenger({ birth_date })}
+          label="Birthday"
+          format='DD/MM/YYYY'
+        />
       </LocalizationProvider>
       <TextField label="Turkish ID Number" inputProps={{ maxLength: 11 }} value={national_id} onChange={(e) => updatePassenger({ national_id: e.target.value })} />
       <TextField label="Email" type='email' value={email} onChange={(e) => updatePassenger({ email: e.target.value })} />
@@ -58,7 +64,7 @@ export default function PassengerForm() {
         variant='contained'
         onClick={handleSubmit}
       >
-        Submit
+        Continue
       </Button>
       <Typography align='center' color='error'> {errorMessage} </Typography>
     </Stack>
