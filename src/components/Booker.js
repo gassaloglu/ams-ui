@@ -20,6 +20,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
+import { useNavigate } from "react-router-dom";
+
 import airports from "../airports.json"
 
 export default function Booker() {
@@ -45,6 +47,8 @@ function FlightsTab() {
   const [fromAirport, setFromAirport] = useState(null);
   const [toAirport, setToAirport] = useState(null);
   const [departureDate, setDepartureDate] = useState(null);
+
+  const navigate = useNavigate()
 
   return (
     <Stack direction="row" spacing={2} justifyContent="space-evenly">
@@ -84,7 +88,15 @@ function FlightsTab() {
 
       <Button
         variant="contained"
-        onClick={(e) => console.log("TODO: Handle Flights click here")}
+        onClick={(e) => {
+          if (!fromAirport || !toAirport || !departureDate)
+            return e.preventDefault();
+
+          console.log(fromAirport);
+
+          const link = `/flights/${fromAirport}/${toAirport}/${departureDate.format("YYYY-MM-DD")}`;
+          navigate(link);
+        }}
       >
         Search flights
       </Button>
@@ -97,9 +109,8 @@ function AirportSelection({ label, airport, setAirport, disabledAirport }) {
     <Autocomplete
       disablePortal
       value={airport}
-      onChange={(event, value) => setAirport(value)}
+      onChange={(event, value) => setAirport(value.iata)}
       options={airports}
-      getOptionLabel={(option) => option.iata}
       renderOption={(props, option) => (
         <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
           {option.name}
