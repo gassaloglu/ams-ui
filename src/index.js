@@ -25,7 +25,7 @@ import DashboardIndex from './routes/dashboard/DashboardIndex';
 import ListChild from './routes/dashboard/ListChild';
 import ListCIP from './routes/dashboard/ListCIP';
 import ListDisabled from './routes/dashboard/ListDisabled';
-import ListEmployee from './routes/dashboard/ListEmployee';
+import { ListEmployee, listEmployeeLoader } from './routes/dashboard/ListEmployee';
 import { ListFlight, listFlightLoader } from './routes/dashboard/ListFlight';
 import ListLuggage from './routes/dashboard/ListLuggage';
 import ListMeal from './routes/dashboard/ListMeal';
@@ -133,7 +133,8 @@ const router = createBrowserRouter([
           },
           {
             path: "list-employee",
-            element: <ListEmployee />
+            element: <ListEmployee />,
+            loader: listEmployeeLoader,
           },
           {
             path: "list-user",

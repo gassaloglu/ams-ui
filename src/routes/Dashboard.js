@@ -4,8 +4,6 @@ import { NavLink as NavLinkBase, Outlet, useRouteError } from 'react-router-dom'
 import Error from "../components/Error";
 import { Center } from "../components/Styled";
 import { useAuth } from '../hooks/useAuth';
-
-
 import { Accessible, AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Luggage, Person, PersonAdd, PersonAddAlt, PersonAddAlt1, Restaurant, Star, Stroller, Warehouse } from '@mui/icons-material';
 import { EmptyPage } from '../components/Page';
 
