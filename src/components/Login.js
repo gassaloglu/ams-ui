@@ -36,14 +36,10 @@ export default function Login() {
     const key = is_employee ? nationalId : email;
 
     axios.post('/login', { is_employee, key, password })
-      .then(({ data: { token } }) => {
-        login({ token, is_employee });
-
-        if (location.state?.redirect) {
-          navigate(location.state.redirect, { replace: true });
-        } else {
-          navigate('/', { replace: true });
-        }
+      .then(({ data: { token, permission } }) => {
+        login({ token, is_employee, permission });
+        const route = location.state?.redirect || (is_employee ? '/dashboard' : '/');
+        navigate(route, { replace: true });
       })
       .catch(error => {
         if (error.response) {
@@ -72,6 +68,7 @@ export default function Login() {
               error={authFailed}
               label="National id"
               size="small"
+              inputProps={{ maxLength: 11 }}
               value={nationalId}
               onChange={(e) => setNationalId(e.target.value)}
             />

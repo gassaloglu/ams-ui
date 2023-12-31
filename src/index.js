@@ -7,14 +7,31 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
 import Auth from './routes/Auth';
-import Protected from './routes/Protected';
+import { Protected, EmployeeOnly } from './routes/Protected';
 import Home from './routes/Home';
 import Login from './routes/Login';
 import Signup from './routes/Signup';
-import Profile from './routes/Profile';
 import { Booking, BookingErrorBoundary, bookingLoader } from './routes/Booking';
 import { CheckIn, CheckInErrorBoundary, checkInLoader } from './routes/CheckIn';
 import { Flights, FlightsErrorBoundary, flightsLoader } from './routes/Flights';
+
+import Dashboard from './routes/Dashboard';
+import AddEmployee from './routes/dashboard/AddEmployee';
+import AddFlight from './routes/dashboard/AddFlight';
+import AddMoney from './routes/dashboard/AddMoney';
+import AddPlane from './routes/dashboard/AddPlane';
+import CheckInPanel from './routes/dashboard/CheckInPanel';
+import DashboardIndex from './routes/dashboard/DashboardIndex';
+import ListChild from './routes/dashboard/ListChild';
+import ListCIP from './routes/dashboard/ListCIP';
+import ListDisabled from './routes/dashboard/ListDisabled';
+import ListEmployee from './routes/dashboard/ListEmployee';
+import ListFlight from './routes/dashboard/ListFlight';
+import ListLuggage from './routes/dashboard/ListLuggage';
+import ListMeal from './routes/dashboard/ListMeal';
+import ListPassenger from './routes/dashboard/ListPassenger';
+import ListPlane from './routes/dashboard/ListPlane';
+import ListUser from './routes/dashboard/ListUser';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -72,8 +89,74 @@ const router = createBrowserRouter([
         errorElement: <CheckInErrorBoundary />,
       },
       {
-        path: "/profile",
-        element: <Protected Layout={Profile} />
+        path: "/dashboard",
+        element: <EmployeeOnly Layout={Dashboard} />,
+        children: [
+          {
+            index: true,
+            element: <DashboardIndex />,
+          },
+          {
+            path: "list-flight",
+            element: <ListFlight />
+          },
+          {
+            path: "list-plane",
+            element: <ListPlane />
+          },
+          {
+            path: "list-passenger",
+            element: <ListPassenger />
+          },
+          {
+            path: "list-cip",
+            element: <ListCIP />
+          },
+          {
+            path: "list-child",
+            element: <ListChild />
+          },
+          {
+            path: "list-disabled",
+            element: <ListDisabled />
+          },
+          {
+            path: "list-luggage",
+            element: <ListLuggage />
+          },
+          {
+            path: "list-meal",
+            element: <ListMeal />
+          },
+          {
+            path: "list-employee",
+            element: <ListEmployee />
+          },
+          {
+            path: "list-user",
+            element: <ListUser />
+          },
+          {
+            path: "add-plane",
+            element: <AddPlane />
+          },
+          {
+            path: "add-employee",
+            element: <AddEmployee />
+          },
+          {
+            path: "add-money",
+            element: <AddMoney />
+          },
+          {
+            path: "add-flight",
+            element: <AddFlight />
+          },
+          {
+            path: "check-in",
+            element: <CheckInPanel />
+          }
+        ]
       },
     ],
   },
