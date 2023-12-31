@@ -109,7 +109,7 @@ function AirportSelection({ label, airport, setAirport, disabledAirport }) {
     <Autocomplete
       disablePortal
       value={airport}
-      onChange={(event, value) => setAirport(value.iata)}
+      onChange={(event, value) => setAirport(value ? value.iata : null)}
       options={airports}
       renderOption={(props, option) => (
         <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
