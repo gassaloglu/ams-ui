@@ -90,7 +90,6 @@ export function ListFlight() {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSizeOptions={[5]}
           disableRowSelectionOnClick
           slots={{
             toolbar: GridToolbar,

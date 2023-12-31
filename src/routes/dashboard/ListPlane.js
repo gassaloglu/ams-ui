@@ -3,7 +3,6 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { Box, Chip } from '@mui/material';
 import { useLoaderData } from 'react-router-dom';
 import { EmptyPage } from '../../components/Page';
-import styled from '@emotion/styled';
 
 const Status = ({ active }) =>
   <Chip
@@ -55,7 +54,6 @@ export function ListPlane() {
         <DataGrid
           rows={rows}
           columns={columns}
-          pageSizeOptions={[5]}
           disableRowSelectionOnClick
           slots={{
             toolbar: GridToolbar,

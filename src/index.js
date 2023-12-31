@@ -29,7 +29,7 @@ import ListEmployee from './routes/dashboard/ListEmployee';
 import { ListFlight, listFlightLoader } from './routes/dashboard/ListFlight';
 import ListLuggage from './routes/dashboard/ListLuggage';
 import ListMeal from './routes/dashboard/ListMeal';
-import ListPassenger from './routes/dashboard/ListPassenger';
+import { ListPassenger, listPassengerLoader } from './routes/dashboard/ListPassenger';
 import { ListPlane, listPlaneLoader } from './routes/dashboard/ListPlane';
 import ListUser from './routes/dashboard/ListUser';
 
@@ -108,7 +108,8 @@ const router = createBrowserRouter([
           },
           {
             path: "list-passenger",
-            element: <ListPassenger />
+            element: <ListPassenger />,
+            loader: listPassengerLoader,
           },
           {
             path: "list-cip",
