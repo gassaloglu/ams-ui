@@ -81,7 +81,8 @@ export function Dashboard() {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
             color: "white",
-            backgroundColor: "primary.main"
+            backgroundColor: "primary.main",
+            overflowX: 'hidden',
           },
         }}
       >
