@@ -15,7 +15,7 @@ import { Booking, BookingErrorBoundary, bookingLoader } from './routes/Booking';
 import { CheckIn, CheckInErrorBoundary, checkInLoader } from './routes/CheckIn';
 import { Flights, FlightsErrorBoundary, flightsLoader } from './routes/Flights';
 
-import Dashboard from './routes/Dashboard';
+import { Dashboard, DashboardErrorBoundary } from './routes/Dashboard';
 import AddEmployee from './routes/dashboard/AddEmployee';
 import AddFlight from './routes/dashboard/AddFlight';
 import AddMoney from './routes/dashboard/AddMoney';
@@ -26,7 +26,7 @@ import ListChild from './routes/dashboard/ListChild';
 import ListCIP from './routes/dashboard/ListCIP';
 import ListDisabled from './routes/dashboard/ListDisabled';
 import ListEmployee from './routes/dashboard/ListEmployee';
-import ListFlight from './routes/dashboard/ListFlight';
+import { ListFlight, listFlightLoader } from './routes/dashboard/ListFlight';
 import ListLuggage from './routes/dashboard/ListLuggage';
 import ListMeal from './routes/dashboard/ListMeal';
 import ListPassenger from './routes/dashboard/ListPassenger';
@@ -98,7 +98,8 @@ const router = createBrowserRouter([
           },
           {
             path: "list-flight",
-            element: <ListFlight />
+            element: <ListFlight />,
+            loader: listFlightLoader,
           },
           {
             path: "list-plane",
@@ -156,7 +157,7 @@ const router = createBrowserRouter([
             path: "check-in",
             element: <CheckInPanel />
           }
-        ]
+        ].map(route => Object.assign(route, { errorElement: <DashboardErrorBoundary /> }))
       },
     ],
   },

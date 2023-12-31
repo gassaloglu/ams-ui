@@ -9,3 +9,11 @@ export default function Page({ children }) {
     </Stack>
   );
 }
+
+export function EmptyPage({ children }) {
+  return (
+    <Stack sx={{ width: '100%', height: '100vh' }}>
+      {children}
+    </Stack>
+  );
+}

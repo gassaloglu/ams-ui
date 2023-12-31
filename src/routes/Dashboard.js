@@ -1,9 +1,13 @@
-import { Stack, Drawer, ListItemButton, ListItemText, ListItemIcon, Toolbar, List, Divider, Typography } from '@mui/material';
-import { Outlet, NavLink as NavLinkBase } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from '@mui/material';
 import React from 'react';
+import { NavLink as NavLinkBase, Outlet, useRouteError } from 'react-router-dom';
+import Error from "../components/Error";
+import { Center } from "../components/Styled";
+import { useAuth } from '../hooks/useAuth';
 
-import { ConnectingAirports, Warehouse, PersonAddAlt1, AttachMoney, AirplaneTicket, Airlines, FlightTakeoff, Flight, AirlineSeatReclineNormal, Star, Stroller, Accessible, Luggage, Restaurant, Badge, Person, PersonAdd, PersonAddAlt } from '@mui/icons-material';
+
+import { Accessible, AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Luggage, Person, PersonAdd, PersonAddAlt, PersonAddAlt1, Restaurant, Star, Stroller, Warehouse } from '@mui/icons-material';
+import { EmptyPage } from '../components/Page';
 
 const DRAWER_WIDTH = "300px";
 
@@ -62,7 +66,7 @@ const NavLink = React.forwardRef((props, ref) => (
   />
 ));
 
-export default function Dashboard() {
+export function Dashboard() {
   const { user } = useAuth();
 
   return (
@@ -108,5 +112,29 @@ export default function Dashboard() {
       </ Drawer >
       <Outlet />
     </Stack>
+  );
+}
+
+export function DashboardErrorBoundary() {
+  const error = useRouteError();
+
+  return (
+    <EmptyPage>
+      <Center>
+        {
+          error.response
+            ?
+            <Error title="Error">
+              <strong>Status:</strong> {error.response.status} {error.response.statusText}
+              <br />
+              <strong>Error message:</strong> {error.response.data}
+            </Error>
+            :
+            <Error title="Something went wrong">
+              An unknown error has occurred, please check your internet connection.
+            </Error>
+        }
+      </Center >
+    </EmptyPage>
   );
 }
