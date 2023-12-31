@@ -1,11 +1,33 @@
 import { axios } from '../../index';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { Box } from '@mui/material';
+import { Box, Chip } from '@mui/material';
 import { useLoaderData } from 'react-router-dom';
 import { EmptyPage } from '../../components/Page';
 import dayjs from 'dayjs';
 
 const dateFormatter = params => dayjs(params.value).format('llll');
+const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+const styles = {
+  completed: {},
+  onflight: {
+    backgroundColor: 'primary.main',
+    color: 'white',
+  },
+  scheduled: {
+    backgroundColor: 'violet',
+  }
+}
+
+const Status = ({ status }) =>
+  <Chip
+    size='small'
+    label={capitalize(status)}
+    sx={{
+      width: '100px',
+      ...styles[status]
+    }}
+  />
 
 const columns = [
   {
@@ -53,10 +75,13 @@ const columns = [
     field: 'status',
     headerName: 'Status',
     flex: 1,
+    renderCell: params => <Status status={params.value} />
   },
 ];
 
 export function ListFlight() {
+  // Note: MUI DataGrid requires all rows to have a unique `id` property.
+  // Since our database handles that case, we don't need to map any rows.
   const rows = useLoaderData();
 
   return (
