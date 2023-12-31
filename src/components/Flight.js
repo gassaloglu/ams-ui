@@ -12,7 +12,7 @@ export const getPrice = (basePrice, ticketType) => {
       return parseFloat(basePrice).toFixed(2);
     case 'Advantage':
       return (parseFloat(basePrice) * PRICE_CONSTANT).toFixed(2);
-    case 'comfort':
+    case 'Comfort':
       return (parseFloat(basePrice) * PRICE_CONSTANT * PRICE_CONSTANT).toFixed(2);
   }
 }

@@ -98,7 +98,7 @@ export async function bookingLoader({ params: { flight_number, plan } }) {
     axios.get(`/flight/seats?id=${flight_number}`),
   ]);
 
-  if (!["Essentials", "Advantage", "comfort"].includes(plan))
+  if (!["Essentials", "Advantage", "Comfort"].includes(plan))
     throw new Error(`Invalid ticket type "${plan}"`);
 
   return { flight, occupation, plan };
