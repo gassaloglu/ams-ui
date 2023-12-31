@@ -31,7 +31,7 @@ import ListLuggage from './routes/dashboard/ListLuggage';
 import ListMeal from './routes/dashboard/ListMeal';
 import { ListPassenger, listPassengerLoader } from './routes/dashboard/ListPassenger';
 import { ListPlane, listPlaneLoader } from './routes/dashboard/ListPlane';
-import ListUser from './routes/dashboard/ListUser';
+import { ListUser, listUserLoader } from './routes/dashboard/ListUser';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -137,7 +137,8 @@ const router = createBrowserRouter([
           },
           {
             path: "list-user",
-            element: <ListUser />
+            element: <ListUser />,
+            loader: listUserLoader,
           },
           {
             path: "add-plane",
