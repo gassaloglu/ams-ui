@@ -13,11 +13,6 @@ const tools = {
   listFlights: { name: "List flights", link: "/dashboard/list-flight", icon: <FlightTakeoff /> },
   listPlanes: { name: "List planes", link: "/dashboard/list-plane", icon: <Flight /> },
   listPassengers: { name: "List passengers", link: "/dashboard/list-passenger", icon: <AirlineSeatReclineNormal /> },
-  listCip: { name: "List CIP passengers", link: "/dashboard/list-cip", icon: <Star /> },
-  listChild: { name: "List child passengers", link: "/dashboard/list-child", icon: <Stroller /> },
-  listDisabled: { name: "List disabled passengers", link: "/dashboard/list-disabled", icon: <Accessible /> },
-  listLuggage: { name: "List luggages", link: "/dashboard/list-luggage", icon: < Luggage /> },
-  listMeal: { name: "List meal orders", link: "/dashboard/list-meal", icon: <Restaurant /> },
   listEmployee: { name: "List employees", link: "/dashboard/list-employee", icon: <Badge /> },
   listUser: { name: "List users", link: "/dashboard/list-user", icon: <Person /> },
   addPlane: { name: "Add plane", link: "/dashboard/add-plane", icon: <Warehouse /> },
@@ -36,15 +31,7 @@ const toolsOfPermission = {
   "passenger_services": [
     tools.listFlights,
     tools.listPassengers,
-    tools.listCip,
-    tools.listChild,
-    tools.listDisabled,
     tools.checkIn,
-  ],
-  "ground_services": [
-    tools.listLuggage,
-    tools.listPlanes,
-    tools.listMeal,
   ],
   "seller": [
     tools.addMoney

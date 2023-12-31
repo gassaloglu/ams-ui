@@ -22,13 +22,8 @@ import AddMoney from './routes/dashboard/AddMoney';
 import AddPlane from './routes/dashboard/AddPlane';
 import CheckInPanel from './routes/dashboard/CheckInPanel';
 import DashboardIndex from './routes/dashboard/DashboardIndex';
-import ListChild from './routes/dashboard/ListChild';
-import ListCIP from './routes/dashboard/ListCIP';
-import ListDisabled from './routes/dashboard/ListDisabled';
 import { ListEmployee, listEmployeeLoader } from './routes/dashboard/ListEmployee';
 import { ListFlight, listFlightLoader } from './routes/dashboard/ListFlight';
-import ListLuggage from './routes/dashboard/ListLuggage';
-import ListMeal from './routes/dashboard/ListMeal';
 import { ListPassenger, listPassengerLoader } from './routes/dashboard/ListPassenger';
 import { ListPlane, listPlaneLoader } from './routes/dashboard/ListPlane';
 import { ListUser, listUserLoader } from './routes/dashboard/ListUser';
@@ -110,26 +105,6 @@ const router = createBrowserRouter([
             path: "list-passenger",
             element: <ListPassenger />,
             loader: listPassengerLoader,
-          },
-          {
-            path: "list-cip",
-            element: <ListCIP />
-          },
-          {
-            path: "list-child",
-            element: <ListChild />
-          },
-          {
-            path: "list-disabled",
-            element: <ListDisabled />
-          },
-          {
-            path: "list-luggage",
-            element: <ListLuggage />
-          },
-          {
-            path: "list-meal",
-            element: <ListMeal />
           },
           {
             path: "list-employee",
