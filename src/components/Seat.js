@@ -84,7 +84,7 @@ export const seatToAlphaIndex = ({ rowId, areaId, seatId }) =>
   (rowId + 1).toString() + String.fromCharCode(65 + 3 * areaId + seatId);
 
 export const indexToAlphaIndex = i => {
-  const rowId = Math.floor(i / 10);
-  const offset = i % 10;
+  const rowId = Math.floor(i / 9);
+  const offset = i % 9;
   return (rowId + 1).toString() + String.fromCharCode(65 + offset);
 }
