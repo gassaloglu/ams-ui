@@ -34,6 +34,7 @@ const toolsOfPermission = {
     tools.checkIn,
   ],
   "seller": [
+    tools.listUser,
     tools.addMoney
   ],
   "admin": Object.values(tools),
