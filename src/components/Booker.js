@@ -8,6 +8,10 @@ import TabPanel from '@mui/lab/TabPanel'
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 
 import Stack from '@mui/material/Stack';
 
@@ -106,20 +110,26 @@ function FlightsTab() {
 
 function AirportSelection({ label, airport, setAirport, disabledAirport }) {
   return (
-    <Autocomplete
-      disablePortal
-      value={airport}
-      onChange={(event, value) => setAirport(value ? value.iata : null)}
-      options={airports}
-      renderOption={(props, option) => (
-        <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-          {option.name}
-        </Box>
-      )}
-      getOptionDisabled={airport => airport.iata === disabledAirport}
-      sx={{ width: 150 }}
-      renderInput={params => <TextField {...params} label={label} />}
-    />
+    <FormControl>
+      <InputLabel>{label}</InputLabel>
+      <Select
+        sx={{ width: 150 }}
+        value={airport}
+        onChange={(event) => setAirport(event.target.value)}
+        label={label}
+        renderValue={(value) => value ? value : ''}
+      >
+        {airports.map((option) => (
+          <MenuItem
+            key={option.iata}
+            value={option.iata}
+            disabled={option.iata === disabledAirport}
+          >
+            {option.name}
+          </MenuItem>
+        ))}
+      </Select>
+  </FormControl>
   );
 }
 
