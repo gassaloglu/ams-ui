@@ -116,7 +116,7 @@ function AirportSelection({ label, airport, setAirport, disabledAirport }) {
           {option.name}
         </Box>
       )}
-      getOptionDisabled={airport => airport === disabledAirport}
+      getOptionDisabled={airport => airport.iata === disabledAirport}
       sx={{ width: 150 }}
       renderInput={params => <TextField {...params} label={label} />}
     />
