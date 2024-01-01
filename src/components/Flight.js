@@ -57,7 +57,7 @@ export function Flight({ flight_number, departure_airport, destination_airport, 
             <Benefit icon={<FlightClass />}> Standard Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
           </Plan>
-          <Plan label='comfort' dash={red[500]} price={getPrice(price, 'comfort')} onClick={() => handleClick('comfort')}>
+          <Plan label='comfort' dash={red[500]} price={getPrice(price, 'Comfort')} onClick={() => handleClick('Comfort')}>
             <Benefit icon={<Luggage />}> 45 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}>  Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
