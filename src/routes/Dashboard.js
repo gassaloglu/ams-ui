@@ -1,6 +1,6 @@
-import { Divider, Drawer, List, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from '@mui/material';
+import { Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from '@mui/material';
 import React from 'react';
-import { NavLink as NavLinkBase, Outlet, useRouteError } from 'react-router-dom';
+import { Link, NavLink as NavLinkBase, Outlet, useRouteError } from 'react-router-dom';
 import Error from "../components/Error";
 import { Center } from "../components/Styled";
 import { useAuth } from '../hooks/useAuth';
@@ -80,7 +80,15 @@ export function Dashboard() {
             justifyContent: 'center',
             flexFlow: 'column'
           }}>
-          <Airlines sx={{ fontSize: '150px' }} />
+          <IconButton
+            disableRipple
+            color='inherit'
+            aria-label='logo'
+            LinkComponent={Link}
+            to='/'
+          >
+            <Airlines sx={{ fontSize: '150px' }} />
+          </IconButton>
           <Typography variant='h6'> AIRLINE COMPANY </Typography>
         </Toolbar>
         <Divider />

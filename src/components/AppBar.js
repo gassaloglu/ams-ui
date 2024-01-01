@@ -42,8 +42,14 @@ export default function AppBar() {
           spacing={1}
           divider={<Divider variant='' orientation="vertical" flexItem />}
         >
+          {
+            (user && user.is_employee) &&
+            <Button component={NavLink} to='/dashboard' variant='text' color='inherit'>Dashboard</Button>
+          }
+
           <Button component={NavLink} to='/about' variant='text' color='inherit'>About us</Button>
           <Button component={NavLink} to='/signup' variant='text' color='inherit'>Sign up</Button>
+
           {
             user
               ? <Button onClick={() => logout()} variant='text' color='inherit'>Log out</Button>
