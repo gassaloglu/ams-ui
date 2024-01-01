@@ -1,4 +1,4 @@
-import { Paper, TextField, Stack, Typography, Alert, Grow } from "@mui/material"
+import { Paper, TextField, Stack, Typography, Alert, Grow, FormControl, Select, MenuItem, InputLabel } from "@mui/material"
 import { EmptyPage } from "../../components/Page"
 import { Center } from "../../components/Styled"
 import { LoadingButton } from "@mui/lab"
@@ -9,11 +9,18 @@ export default function AddPlane() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
-  const [registration, setRegistration] = useState('');
+  const [registration, setRegistration] = useState('TC-');
   const [model, setModel] = useState('');
 
+  const handleRegistrationInput = event => {
+    if (!event.target.value.startsWith("TC-"))
+      return event.preventDefault();
+
+    setRegistration(event.target.value.toUpperCase());
+  }
+
   const checkInputs = () => {
-    if (!registration) {
+    if (registration.trim().length != 6) {
       setError('Please enter a plane registration.');
     } else if (!model) {
       setError('Please enter a plane model.');
@@ -63,17 +70,26 @@ export default function AddPlane() {
 
           <Stack spacing={1} sx={{ width: '450px' }}>
             <TextField
-              label="Registration"
+              label="Plane Registration"
               value={registration}
-              onChange={(e) => setRegistration(e.target.value)}
-              inputProps={{ maxLength: 6 }}
+              onChange={handleRegistrationInput}
+              inputProps={{ maxLength: 6, style: { textTransform: "uppercase" } }}
             />
 
-            <TextField
-              label="Model"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-            />
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label">Plane Model</InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={model}
+                label="Plane Model"
+                onChange={e => setModel(e.target.value)}
+              >
+                <MenuItem value={'Airbus A350'}>Airbus A350</MenuItem>
+                <MenuItem value={'Boeing 777'}>Boeing 777</MenuItem>
+                <MenuItem value={'Boeing 787'}>Boeing 787</MenuItem>
+              </Select>
+            </FormControl>
 
             <Stack direction='row' spacing={1}>
               <Typography
