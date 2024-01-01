@@ -1,7 +1,20 @@
+import React from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Link } from 'react-router-dom';
+import { Link, NavLink as NavLinkBase } from 'react-router-dom';
 import { AppBar as MuiAppBar, Toolbar, Typography, IconButton, Stack, Button, Divider } from '@mui/material';
 import AirlinesIcon from '@mui/icons-material/Airlines';
+
+const NavLink = React.forwardRef((props, ref) => (
+  <NavLinkBase
+    ref={ref}
+    {...props}
+    style={({ isActive }) => {
+      return {
+        backgroundColor: isActive ? "#1565c0" : "",
+      };
+    }}
+  />
+));
 
 export default function AppBar() {
   const { user, logout } = useAuth();
@@ -18,7 +31,7 @@ export default function AppBar() {
           LinkComponent={Link}
           to='/'
         >
-          <AirlinesIcon />
+          <AirlinesIcon sx={{ fontSize: '40px' }} />
         </IconButton>
         <Typography variant='h6' sx={{ flexGrow: 1 }}>
           AIRLINE COMPANY
@@ -29,13 +42,12 @@ export default function AppBar() {
           spacing={1}
           divider={<Divider variant='' orientation="vertical" flexItem />}
         >
-          <Button href='/project' variant='text' color='inherit'>Project Details</Button>
-          <Button href='/about' variant='text' color='inherit'>About us</Button>
-          <Button href='/signup' variant='text' color='inherit'>Sign up</Button>
+          <Button component={NavLink} to='/about' variant='text' color='inherit'>About us</Button>
+          <Button component={NavLink} to='/signup' variant='text' color='inherit'>Sign up</Button>
           {
             user
               ? <Button onClick={() => logout()} variant='text' color='inherit'>Log out</Button>
-              : <Button href='/login' variant='text' color='inherit'>Log in</Button>
+              : <Button component={NavLink} to='/login' variant='text' color='inherit'>Log in</Button>
           }
         </Stack>
       </Toolbar>

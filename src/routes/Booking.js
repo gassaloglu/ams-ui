@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { useLoaderData, useRouteError } from 'react-router-dom';
+import { useLoaderData, useRouteError, Link } from 'react-router-dom';
 import { chunk, isEqual } from 'underscore';
 import { useImmer } from 'use-immer';
 import { axios } from '../index';
@@ -244,7 +244,12 @@ function Payment() {
             <Typography>
               Your reservation number is: <strong> {pnr} </strong>
             </Typography>
-            <Button sx={{ mt: 1 }} href={`/checkin/${pnr}/${booking.surname}`} variant="contained">
+
+            <Button
+              sx={{ mt: 1 }}
+              component={Link}
+              to={`/checkin/${pnr}/${booking.surname}`}
+              variant="contained">
               See check-in details
             </Button>
           </Status>
