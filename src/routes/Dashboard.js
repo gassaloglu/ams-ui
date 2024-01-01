@@ -163,9 +163,9 @@ export function DashboardErrorBoundary() {
   );
 }
 
-const permissionString = {
+export const permissionString = {
   'admin': 'Admin',
-  'passenger_services': 'Passenger Services',
-  'flight_planner': 'Flight Planner',
+  'passenger_services': 'Passenger services',
+  'flight_planner': 'Flight planner',
   'seller': 'Seller',
 }
