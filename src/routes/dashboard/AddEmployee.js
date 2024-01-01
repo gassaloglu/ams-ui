@@ -148,6 +148,7 @@ export default function AddEmployee() {
 
             <TextField
               label="Password"
+              type="password"
               value={form.password}
               onChange={(e) => update({ password: e.target.value })}
             />
