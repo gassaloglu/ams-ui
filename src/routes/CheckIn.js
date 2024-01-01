@@ -123,7 +123,7 @@ function CheckInData({ checkin, flight }) {
             {checkin.name} {checkin.surname}
           </Typography>
 
-          <Grow in={cancelled ^ alreadyCheckedIn}>
+          <Grow in={cancelled !== alreadyCheckedIn}>
             <Chip
               label={cancelled ? "Cancelled" : "Checked-in"}
               color={cancelled ? 'error' : 'success'}
