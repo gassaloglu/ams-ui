@@ -46,11 +46,21 @@ export default function Booker() {
 }
 
 function FlightsTab() {
-  const [fromAirport, setFromAirport] = useState(null);
-  const [toAirport, setToAirport] = useState(null);
+  const [fromAirport, setFromAirport] = useState('');
+  const [toAirport, setToAirport] = useState('');
   const [departureDate, setDepartureDate] = useState(null);
 
   const navigate = useNavigate()
+
+  const handleClick = e => {
+    if (!fromAirport || !toAirport || !departureDate)
+      return e.preventDefault();
+
+    const date = departureDate.format("YYYY-MM-DD");
+    const link = `/flights/${fromAirport}/${toAirport}/${date}`;
+
+    navigate(link);
+  }
 
   return (
     <Stack direction="row" spacing={2} justifyContent="space-evenly">
@@ -90,15 +100,7 @@ function FlightsTab() {
 
       <Button
         variant="contained"
-        onClick={(e) => {
-          if (!fromAirport || !toAirport || !departureDate)
-            return e.preventDefault();
-
-          console.log(fromAirport);
-
-          const link = `/flights/${fromAirport}/${toAirport}/${departureDate.format("YYYY-MM-DD")}`;
-          navigate(link);
-        }}
+        onClick={handleClick}
       >
         Search flights
       </Button>
