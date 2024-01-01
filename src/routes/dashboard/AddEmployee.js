@@ -88,7 +88,7 @@ export default function AddEmployee() {
       <Center>
         <Paper sx={{ p: 2, borderRadius: 3 }} elevation={3}>
           {
-            alert && <Grow in={alert}>
+            alert && <Grow in={Boolean(alert)}>
               <Alert
                 sx={{ mb: 2 }}
                 severity={alert.severity}

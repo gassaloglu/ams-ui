@@ -116,6 +116,7 @@ export default function Signup() {
             forceCallingCode
             defaultCountry='TR'
             value={user.phone}
+            getFlagElement={() => { }}
             onChange={phone => set({ phone })}
           />
           <GenderSelection

@@ -4,7 +4,7 @@ import { NavLink as NavLinkBase, Outlet, useRouteError } from 'react-router-dom'
 import Error from "../components/Error";
 import { Center } from "../components/Styled";
 import { useAuth } from '../hooks/useAuth';
-import { Accessible, AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Luggage, Person, PersonAdd, PersonAddAlt, PersonAddAlt1, Restaurant, Star, Stroller, Warehouse } from '@mui/icons-material';
+import { AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Person, PersonAddAlt1, Warehouse } from '@mui/icons-material';
 import { EmptyPage } from '../components/Page';
 
 const DRAWER_WIDTH = "300px";
@@ -16,7 +16,7 @@ const tools = {
   listEmployee: { name: "List employees", link: "/dashboard/list-employee", icon: <Badge /> },
   listUser: { name: "List users", link: "/dashboard/list-user", icon: <Person /> },
   addPlane: { name: "Add plane", link: "/dashboard/add-plane", icon: <Warehouse /> },
-  addPlane: { name: "Add employee", link: "/dashboard/add-employee", icon: <PersonAddAlt1 /> },
+  addEmployee: { name: "Add employee", link: "/dashboard/add-employee", icon: <PersonAddAlt1 /> },
   addMoney: { name: "Add money to user", link: "/dashboard/add-money", icon: <AttachMoney /> },
   addFlight: { name: "Add flight", link: "/dashboard/add-flight", icon: <ConnectingAirports /> },
   checkIn: { name: "Check-in", link: "/dashboard/check-in", icon: <AirplaneTicket /> },
