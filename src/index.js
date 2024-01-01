@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import Axios from 'axios';
 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -15,7 +15,6 @@ import { Booking, BookingErrorBoundary, bookingLoader } from './routes/Booking';
 import { CheckIn, CheckInErrorBoundary, checkInLoader } from './routes/CheckIn';
 import { Flights, FlightsErrorBoundary, flightsLoader } from './routes/Flights';
 
-import { Dashboard, DashboardErrorBoundary } from './routes/Dashboard';
 import AddEmployee from './routes/dashboard/AddEmployee';
 import AddFlight from './routes/dashboard/AddFlight';
 import AddMoney from './routes/dashboard/AddMoney';
@@ -27,6 +26,9 @@ import { ListFlight, listFlightLoader } from './routes/dashboard/ListFlight';
 import { ListPassenger, listPassengerLoader } from './routes/dashboard/ListPassenger';
 import { ListPlane, listPlaneLoader } from './routes/dashboard/ListPlane';
 import { ListUser, listUserLoader } from './routes/dashboard/ListUser';
+import { Dashboard, DashboardErrorBoundary } from './routes/Dashboard';
+
+import { Typography, Button, Stack } from '@mui/material';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
@@ -48,10 +50,27 @@ export const theme = createTheme({
   },
 });
 
+const Fallback = () => (
+  <Stack
+    spacing={1}
+    alignItems='center'
+    justifyContent='center'
+    sx={{
+      width: '100%',
+      height: '100vh'
+    }}
+  >
+    <Typography variant='h2'> 404 Not Found </Typography>
+    <Typography> The page you are looking for can't be found.</Typography>
+    <Button variant='outlined' component={Link} to='/'> Return back to home</Button>
+  </Stack>
+);
+
 const router = createBrowserRouter([
   {
     element: <Auth />,
     path: '/',
+    errorElement: <Fallback />,
     children: [
       {
         path: "/",
