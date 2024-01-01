@@ -36,8 +36,8 @@ export default function Login() {
     const key = is_employee ? nationalId : email;
 
     axios.post('/login', { is_employee, key, password })
-      .then(({ data: { token, permission } }) => {
-        login({ token, is_employee, permission });
+      .then(({ data }) => {
+        login({ is_employee, ...data });
         const route = location.state?.redirect || (is_employee ? '/dashboard' : '/');
         navigate(route, { replace: true });
       })

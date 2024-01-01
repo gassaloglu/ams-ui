@@ -1,4 +1,4 @@
-import { Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from '@mui/material';
 import React from 'react';
 import { Link, NavLink as NavLinkBase, Outlet, useRouteError } from 'react-router-dom';
 import Error from "../components/Error";
@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Person, PersonAddAlt1, Warehouse } from '@mui/icons-material';
 import { EmptyPage } from '../components/Page';
 
+const DARK_BLUE = "#1565c0";
 const DRAWER_WIDTH = "300px";
 
 const tools = {
@@ -25,7 +26,7 @@ const tools = {
 const toolsOfPermission = {
   "flight_planner": [
     tools.listFlights,
-    tools.listPassengers,
+    tools.listPlanes,
     tools.addFlight,
   ],
   "passenger_services": [
@@ -46,14 +47,14 @@ const NavLink = React.forwardRef((props, ref) => (
     {...props}
     style={({ isActive }) => {
       return {
-        backgroundColor: isActive ? "#1565c0" : "",
+        backgroundColor: isActive ? DARK_BLUE : "",
       };
     }}
   />
 ));
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <Stack direction='row'>
@@ -91,7 +92,9 @@ export function Dashboard() {
           </IconButton>
           <Typography variant='h6'> AIRLINE COMPANY </Typography>
         </Toolbar>
+
         <Divider />
+
         <List>
           {
             toolsOfPermission[user.permission].map(tool =>
@@ -104,6 +107,32 @@ export function Dashboard() {
             )
           }
         </List>
+
+        <Box flexGrow={1} />
+
+        <Divider />
+
+        <Stack spacing={2} sx={{ p: 2 }}>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <Avatar sx={{ bgcolor: 'primary.main', border: 1 }}>
+              {user.name[0] + user.surname[0]}
+            </Avatar>
+            <Stack>
+              <Typography fontWeight='bold'> {user.name} {user.surname}</Typography>
+              <Typography variant='caption'> {permissionString[user.permission]}</Typography>
+            </Stack>
+          </Stack>
+
+          <Button
+            variant='outlined'
+            color='inherit'
+            onClick={() => logout()}
+          >
+            Log out
+          </Button>
+
+        </Stack>
+
       </ Drawer >
       <Outlet />
     </Stack>
@@ -132,4 +161,11 @@ export function DashboardErrorBoundary() {
       </Center >
     </EmptyPage>
   );
+}
+
+const permissionString = {
+  'admin': 'Admin',
+  'passenger_services': 'Passenger Services',
+  'flight_planner': 'Flight Planner',
+  'seller': 'Seller',
 }
