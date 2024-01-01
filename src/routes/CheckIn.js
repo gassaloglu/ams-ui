@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLoaderData, useRouteError } from 'react-router-dom';
 import { axios } from '../index';
 import dayjs from 'dayjs';
@@ -5,7 +6,8 @@ import dayjs from 'dayjs';
 import { Center } from '../components/Styled';
 import Error from '../components/Error';
 import Page from '../components/Page';
-import { Divider, Paper, Grid, Stack, Typography } from '@mui/material';
+import { Divider, Paper, Grid, Stack, Typography, Grow, Chip, Snackbar, Alert } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
 import { getPrice } from '../components/Flight';
 import { indexToAlphaIndex } from '../components/Seat';
 
@@ -58,12 +60,78 @@ function Info({ label, children }) {
 const question = (b) => b ? 'Yes' : 'No';
 
 function CheckInData({ checkin, flight }) {
+  const [alreadyCheckedIn, setAlreadyCheckedIn] = useState(checkin.check_in === 1);
+  const [cancelled, setCancelled] = useState(false);
+  const [checkinLoading, setCheckinLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [warning, setWarning] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleCheckin = event => {
+    if (alreadyCheckedIn || cancelled)
+      return event.preventDefault();
+
+    setCheckinLoading(true);
+    setError(null);
+    setWarning(false);
+
+    axios.post('/passenger/checkin', {
+      pnr: checkin.pnr_no,
+      surname: checkin.surname,
+    }).then(() => {
+      setAlreadyCheckedIn(true);
+    }).catch(error => {
+      if (error.response) {
+        setError(error.response.data);
+      } else {
+        setWarning(true);
+      }
+    }).finally(() => {
+      setCheckinLoading(false)
+    });
+  }
+
+  const handleCancel = event => {
+    if (alreadyCheckedIn || cancelled)
+      return event.preventDefault();
+
+    setCancelLoading(true);
+    setError(null);
+    setWarning(false);
+
+    axios.post('/passenger/remove', {
+      pnr_no: checkin.pnr_no,
+      surname: checkin.surname,
+    }).then(() => {
+      setCancelled(true);
+    }).catch(error => {
+      if (error.response) {
+        setError(error.response.data);
+      } else {
+        setWarning(true);
+      }
+    }).finally(() => {
+      setCancelLoading(false)
+    });
+  }
+
   return (
     <Paper elevation={5} sx={{ p: 2 }}>
       <Stack spacing={1}>
-        <Typography variant='h3'>
-          {checkin.name} {checkin.surname}
-        </Typography>
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <Typography variant='h3' flexGrow={1}>
+            {checkin.name} {checkin.surname}
+          </Typography>
+
+          <Grow in={cancelled ^ alreadyCheckedIn}>
+            <Chip
+              label={cancelled ? "Cancelled" : "Checked-in"}
+              color={cancelled ? 'error' : 'success'}
+              variant='outlined'
+            />
+          </Grow>
+        </Stack>
+
 
         <Grid container spacing={1}>
           <Grid item xs={4}>
@@ -133,6 +201,41 @@ function CheckInData({ checkin, flight }) {
           </Grid>
         </Grid>
       </Stack>
-    </Paper>
+
+      <Stack direction='row' spacing={2} sx={{ mt: 2 }}>
+        <LoadingButton
+          fullWidth
+          variant='contained'
+          color='error'
+          onClick={handleCancel}
+          disabled={cancelled || alreadyCheckedIn || checkinLoading}
+          loading={cancelLoading}
+        >
+          {cancelled ? "Already cancelled" : "Cancel"}
+        </LoadingButton>
+
+        <LoadingButton
+          fullWidth
+          variant='contained'
+          onClick={handleCheckin}
+          disabled={cancelled || alreadyCheckedIn || cancelLoading}
+          loading={checkinLoading}
+        >
+          {alreadyCheckedIn ? "Already Checked-in" : "Check-in"}
+        </LoadingButton>
+
+        <Snackbar open={Boolean(error)}>
+          <Alert severity="error">
+            {"Error: " + error}
+          </Alert>
+        </Snackbar>
+
+        <Snackbar open={warning}>
+          <Alert severity="warning">
+            {"Something went wrong (probably a network error)."}
+          </Alert>
+        </Snackbar>
+      </Stack>
+    </Paper >
   );
 }

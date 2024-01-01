@@ -127,19 +127,26 @@ function AirportSelection({ label, airport, setAirport, disabledAirport }) {
           </MenuItem>
         ))}
       </Select>
-  </FormControl>
+    </FormControl>
   );
 }
 
 function CheckInTab() {
+  const navigate = useNavigate();
   const [surname, setSurname] = useState('');
   const [pnr, setPnr] = useState('');
+
+  const handleClick = event => {
+    if (!pnr || !surname) return event.preventDefault();
+    navigate(`/checkin/${pnr}/${surname}`);
+  }
 
   return (
     <Stack direction="row" spacing={2} justifyContent="space-evenly">
       <TextField
         value={pnr}
-        onChange={(e) => setPnr(e.target.value)}
+        onChange={(e) => setPnr(e.target.value.toUpperCase())}
+        inputProps={{ maxLength: 8, style: { textTransform: 'uppercase' } }}
         sx={{ width: '300px' }}
         label="Reservation number (PNR)"
       />
@@ -154,7 +161,7 @@ function CheckInTab() {
       <Button
         sx={{ width: '150px' }}
         variant="contained"
-        onClick={(e) => console.log("TODO: Handle Check-in click here")}
+        onClick={handleClick}
       >
         Continue
       </Button>
