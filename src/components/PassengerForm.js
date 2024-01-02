@@ -43,8 +43,8 @@ export default function PassengerForm() {
 
   return (
     <Stack spacing={1} sx={{ m: 'auto', maxWidth: '300px' }}>
-      <TextField label="Name" value={name} onChange={(e) => updatePassenger({ name: e.target.value })} />
-      <TextField label="Surname" value={surname} onChange={(e) => updatePassenger({ surname: e.target.value })} />
+      <TextField label="Name" value={name} onChange={(e) => updatePassenger({ name: e.target.value.trim() })} />
+      <TextField label="Surname" value={surname} onChange={(e) => updatePassenger({ surname: e.target.value.trim() })} />
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
           maxDate={dayjs()}
@@ -54,8 +54,8 @@ export default function PassengerForm() {
           format='DD/MM/YYYY'
         />
       </LocalizationProvider>
-      <TextField label="Turkish ID Number" inputProps={{ maxLength: 11 }} value={national_id} onChange={(e) => updatePassenger({ national_id: e.target.value })} />
-      <TextField label="Email" type='email' value={email} onChange={(e) => updatePassenger({ email: e.target.value })} />
+      <TextField label="Turkish ID Number" inputProps={{ maxLength: 11 }} value={national_id} onChange={(e) => updatePassenger({ national_id: e.target.value.trim() })} />
+      <TextField label="Email" type='email' value={email} onChange={(e) => updatePassenger({ email: e.target.value.trim() })} />
       <MuiTelInput label="Phone number" disableDropdown forceCallingCode defaultCountry='TR' value={phone} onChange={phone => updatePassenger({ phone })} />
       <GenderSelection value={gender} onChange={gender => updatePassenger({ gender })} />
       <DisabledSelection value={disabled} onChange={disabled => updatePassenger({ disabled })} />
