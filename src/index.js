@@ -35,6 +35,7 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import './styles/index.css';
+import About from './routes/About';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
       {
         path: "/signup",
         element: <Signup />,
+      },
+      {
+        path: "/about",
+        element: <About />,
       },
       {
         path: "/flights/:from/:to/:date",
