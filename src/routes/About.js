@@ -37,7 +37,7 @@ export default function About() {
             <Contact
               name="Güney"
               surname="Söğüt"
-              email=""
+              email="guneysogut.10@gmail.com"
               github="https://github.com/guneysogutt"
               linkedin="https://linkedin.com/in/guney-sogut-23a081223"
             />
