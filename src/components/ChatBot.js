@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Box, Stack, TextField, Button, IconButton, Typography, Chip } from "@mui/material";
+import {
+  Box,
+  Stack,
+  TextField,
+  Button,
+  IconButton,
+  Typography,
+  Chip,
+} from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 
 export default function Chatbot() {
@@ -8,49 +16,58 @@ export default function Chatbot() {
   const [messages, setMessages] = useState([
     { sender: "bot", text: "How can I assist you?" },
     { sender: "user", text: "Plan a vacation for me" },
-    { sender: "bot", text: "Here are vacation plans:\nAntalya - Izmir\nIstanbul - Izmir" },
+    {
+      sender: "bot",
+      text: "Here are vacation plans:\nAntalya - Izmir\nIstanbul - Izmir",
+    },
   ]);
 
   const readyPrompts = [
-    "What are your working hours?",
+    "Give me Izmir - Istanbul flights in this month",
     "Can you help me with my account?",
     "Tell me about your services.",
   ];
-
+  /*
   const handleSend = () => {
     if (input.trim()) {
       setMessages([...messages, { sender: "user", text: input }]);
       setInput("");
     }
   };
+*/
 
-/*
-  const handleSend = async () => {
-    if (input.trim()) {
-      setMessages([...messages, { sender: "user", text: input }]);
+  const handleSend = async (prompt = input) => {
+    if (prompt.trim()) {
+      setMessages([...messages, { sender: "user", text: prompt }]);
       setInput("");
 
       // Send user input to the backend
       try {
-        const response = await fetch("/api/chatbot", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: input }),
-        });
+        const response = await fetch(
+          "http://127.0.0.1:8081/api/v1/query_model",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: prompt }),
+          },
+        );
         const data = await response.json();
 
         // Add the bot's response to the chat
-        setMessages((prevMessages) => [...prevMessages, { sender: "bot", text: data.reply }]);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { sender: "bot", text: data.output },
+        ]);
       } catch (error) {
         console.error("Error connecting to chatbot API:", error);
       }
     }
   };
-*/
 
-  const handlePromptClick = (prompt) => {
-    setMessages([...messages, { sender: "user", text: prompt }]);
-  };
+  // const handlePromptClick = (prompt) => {
+  //   setMessages([...messages, { sender: "user", text: prompt }]);
+  //   handleSend();
+  // };
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
@@ -114,8 +131,10 @@ export default function Chatbot() {
                   key={index}
                   sx={{
                     textAlign: message.sender === "user" ? "right" : "left",
-                    alignSelf: message.sender === "user" ? "flex-end" : "flex-start",
-                    backgroundColor: message.sender === "user" ? "#1E3A8A" : "#E2E8F0",
+                    alignSelf:
+                      message.sender === "user" ? "flex-end" : "flex-start",
+                    backgroundColor:
+                      message.sender === "user" ? "#1E3A8A" : "#E2E8F0",
                     color: message.sender === "user" ? "#ffffff" : "#1E293B",
 
                     mb: 1,
@@ -144,7 +163,7 @@ export default function Chatbot() {
                 <Chip
                   key={index}
                   label={prompt}
-                  onClick={() => handlePromptClick(prompt)}
+                  onClick={() => handleSend(prompt)}
                   sx={{
                     backgroundColor: "#e3f2fd",
                     color: "#1565c0",
