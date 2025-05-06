@@ -22,7 +22,7 @@ export default function Login() {
   const [nationalId, setNationalId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [is_employee, setIsEmployee] = useState(false);
+  const [isEmployee, setIsEmployee] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [authFailed, setAuthFailed] = useState(false);
@@ -33,14 +33,25 @@ export default function Login() {
     setAuthFailed(false);
     setLoading(true);
 
-    const key = is_employee ? nationalId : email;
+    let promise;
 
-    axios.post('/login', { is_employee, key, password })
-      .then(({ data }) => {
-        login({ is_employee, ...data });
-        const route = location.state?.redirect || (is_employee ? '/dashboard' : '/');
-        navigate(route, { replace: true });
-      })
+    if (isEmployee) {
+      promise = axios.post('/employees/sessions', { nationalId, password })
+        .then(({ data }) => {
+          login({ is_employee: true, ...data });
+          const route = location.state?.redirect || '/dashboard';
+          navigate(route, { replace: true });
+        })
+    } else {
+      promise = axios.post('/users/sessions', { email, password })
+        .then(({ data }) => {
+          login({ is_employee: false, ...data });
+          const route = location.state?.redirect || '/';
+          navigate(route, { replace: true });
+        })
+    }
+
+    promise
       .catch(error => {
         if (error.response) {
           setAuthFailed(true)
@@ -63,7 +74,7 @@ export default function Login() {
         </Typography>
 
         {
-          is_employee
+          isEmployee
             ? <TextField
               error={authFailed}
               label="National id"
@@ -97,7 +108,7 @@ export default function Login() {
           color="primary"
           size='small'
           fullWidth
-          value={is_employee ? 'employee' : 'user'}
+          value={isEmployee ? 'employee' : 'user'}
           onChange={(e, v) => setIsEmployee(v === 'employee')}
         >
           <ToggleButton value="user">User</ToggleButton>

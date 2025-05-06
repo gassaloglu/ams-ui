@@ -22,7 +22,7 @@ export default function AddEmployee() {
     surname: "",
     email: "",
     phone: "",
-    gender: "Male",
+    gender: "",
     birth_date: "",
     password: "",
     permission: "",

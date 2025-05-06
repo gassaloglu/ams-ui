@@ -26,7 +26,7 @@ export default function Signup() {
     email: '',
     password: '',
     phone: '',
-    gender: "Male",
+    gender: "",
     birth_date: '',
   });
 
@@ -41,7 +41,12 @@ export default function Signup() {
     setSignupFailed(false);
     setLoading(true);
 
-    axios.post('/register', user)
+    const payload = {
+      ...user,
+      phone: user.phone.replace(/\s/g, ''),
+    }
+
+    axios.post('/users', payload)
       .then(({ data: { token } }) => {
         login({ token, is_employee: false });
         navigate('/');
@@ -105,7 +110,7 @@ export default function Signup() {
               label="Birthday"
               slotProps={{ textField: { size: 'small' } }}
               maxDate={dayjs()}
-              onChange={b => set({ birth_date: b.format('YYYY-MM-DD') })}
+              onChange={b => set({ birth_date: b ? b.format() : '' })}
             />
           </LocalizationProvider>
 

@@ -11,8 +11,8 @@ export function GenderSelection({ value, onChange }) {
         onChange={e => onChange(e.target.value)}
         row
       >
-        <FormControlLabel value={"Male"} control={<Radio />} label="Male" />
-        <FormControlLabel value={"Female"} control={<Radio />} label="Female" />
+        <FormControlLabel value={"male"} control={<Radio />} label="Male" />
+        <FormControlLabel value={"female"} control={<Radio />} label="Female" />
       </RadioGroup>
     </FormControl>
   );

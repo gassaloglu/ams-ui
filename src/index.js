@@ -37,12 +37,17 @@ import '@fontsource/roboto/700.css';
 import './styles/index.css';
 import About from './routes/About';
 
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+dayjs.extend(utc)
 
 const user = JSON.parse(localStorage.getItem('user'));
 export const axios = Axios.create({
   headers: user ? { Authorization: `Bearer ${user.token}` } : {},
-  baseURL: "http://localhost:5500",
+  baseURL: "http://localhost:8080",
 });
 
 export const theme = createTheme({
