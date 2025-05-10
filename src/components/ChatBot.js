@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Stack,
@@ -7,41 +7,89 @@ import {
   IconButton,
   Typography,
   Chip,
+  CircularProgress,
 } from "@mui/material";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
+
+// Helper function to format the bot's message
+const formatBotMessage = (text) => {
+  // Split the text into lines
+  const lines = text.split("\n");
+
+  return lines.map((line, index) => {
+    // Check if this is a flight item line
+    if (line.trim().startsWith("*")) {
+      // Process bold text between ** and add line breaks between flight details
+      const formattedLine = line
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold text between **
+        .replace(/, \*\*/g, "<br/><strong>") // Add line breaks before bold sections
+        .replace(/\*\*, /g, "</strong><br/>") // Add line breaks after bold sections
+        .replace(/, /g, "<br/>"); // Add line breaks for other commas
+
+      return (
+        <Typography
+          key={index}
+          component="div"
+          sx={{
+            mb: 1,
+            lineHeight: 1.6,
+            "& strong": {
+              fontWeight: "bold",
+              color: "#1565c0",
+            },
+          }}
+          dangerouslySetInnerHTML={{ __html: formattedLine }}
+        />
+      );
+    }
+
+    // Regular line (not a flight item)
+    return (
+      <Typography key={index} sx={{ mb: 1, lineHeight: 1.6 }}>
+        {line}
+      </Typography>
+    );
+  });
+};
 
 export default function Chatbot() {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "How can I assist you?" },
-    { sender: "user", text: "Plan a vacation for me" },
-    {
-      sender: "bot",
-      text: "Here are vacation plans:\nAntalya - Izmir\nIstanbul - Izmir",
-    },
+    { sender: "bot", text: "Hi there!👋 How can I assist you?" },
   ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
 
   const readyPrompts = [
     "Give me Izmir - Istanbul flights in this month",
-    "Can you help me with my account?",
-    "Tell me about your services.",
+    "Plan me a summer vacation",
+    "Plan me a winter vacation",
+    "What is the biggest plane you have?",
   ];
-  /*
-  const handleSend = () => {
-    if (input.trim()) {
-      setMessages([...messages, { sender: "user", text: input }]);
-      setInput("");
-    }
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-*/
 
   const handleSend = async (prompt = input) => {
     if (prompt.trim()) {
-      setMessages([...messages, { sender: "user", text: prompt }]);
+      const newMessages = [...messages, { sender: "user", text: prompt }];
+      setMessages(newMessages);
       setInput("");
+      setIsLoading(true);
 
-      // Send user input to the backend
+      // Add temporary loading message
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "...", isLoading: true },
+      ]);
+
       try {
         const response = await fetch(
           "http://127.0.0.1:8081/api/v1/query_model",
@@ -53,21 +101,26 @@ export default function Chatbot() {
         );
         const data = await response.json();
 
-        // Add the bot's response to the chat
-        setMessages((prevMessages) => [
-          ...prevMessages,
+        // Remove loading message and add actual response
+        setMessages((prev) => [
+          ...prev.filter((msg) => !msg.isLoading),
           { sender: "bot", text: data.output },
         ]);
       } catch (error) {
         console.error("Error connecting to chatbot API:", error);
+        // Replace loading message with error message
+        setMessages((prev) => [
+          ...prev.filter((msg) => !msg.isLoading),
+          {
+            sender: "bot",
+            text: "Sorry, I encountered an error. Please try again.",
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
       }
     }
   };
-
-  // const handlePromptClick = (prompt) => {
-  //   setMessages([...messages, { sender: "user", text: prompt }]);
-  //   handleSend();
-  // };
 
   const toggleChatbot = () => {
     setIsOpen(!isOpen);
@@ -124,10 +177,11 @@ export default function Chatbot() {
                 borderRadius: "4px",
                 display: "flex",
                 flexDirection: "column",
+                gap: "8px",
               }}
             >
               {messages.map((message, index) => (
-                <Typography
+                <Box
                   key={index}
                   sx={{
                     textAlign: message.sender === "user" ? "right" : "left",
@@ -136,18 +190,29 @@ export default function Chatbot() {
                     backgroundColor:
                       message.sender === "user" ? "#1E3A8A" : "#E2E8F0",
                     color: message.sender === "user" ? "#ffffff" : "#1E293B",
-
-                    mb: 1,
-                    p: 1,
+                    mb: 0,
+                    p: 1.5,
                     borderRadius: "8px",
-                    display: "inline-block",
+                    display: "inline-flex",
                     maxWidth: "70%",
                     wordWrap: "break-word",
+                    minWidth: "40px",
                   }}
                 >
-                  {message.text}
-                </Typography>
+                  {message.isLoading ? (
+                    <CircularProgress size={20} />
+                  ) : message.sender === "bot" ? (
+                    <Box sx={{ lineHeight: 1.3 }}>
+                      {formatBotMessage(message.text)}
+                    </Box>
+                  ) : (
+                    <Typography sx={{ lineHeight: 1.3 }}>
+                      {message.text}
+                    </Typography>
+                  )}
+                </Box>
               ))}
+              <div ref={messagesEndRef} />
             </Box>
             <Stack
               direction="row"
@@ -164,6 +229,7 @@ export default function Chatbot() {
                   key={index}
                   label={prompt}
                   onClick={() => handleSend(prompt)}
+                  disabled={isLoading}
                   sx={{
                     backgroundColor: "#e3f2fd",
                     color: "#1565c0",
@@ -174,39 +240,53 @@ export default function Chatbot() {
                 />
               ))}
             </Stack>
-            <TextField
-              fullWidth
-              placeholder="Type your message..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              sx={{
-                backgroundColor: "white",
-                borderRadius: "4px",
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: "#ccc",
+            <Stack direction="row" spacing={1}>
+              <TextField
+                fullWidth
+                placeholder="Type your message..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                disabled={isLoading}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter" && !isLoading) {
+                    handleSend();
+                  }
+                }}
+                sx={{
+                  backgroundColor: "white",
+                  borderRadius: "4px",
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#ccc",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#888",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#1565c0",
+                    },
                   },
-                  "&:hover fieldset": {
-                    borderColor: "#888",
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={() => handleSend(input)}
+                disabled={isLoading || !input.trim()}
+                sx={{
+                  backgroundColor: "#1565c0",
+                  minWidth: "80px",
+                  "&:hover": {
+                    backgroundColor: "#0d47a1",
                   },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#1565c0",
+                  "&:disabled": {
+                    backgroundColor: "#e0e0e0",
+                    color: "#a0a0a0",
                   },
-                },
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={handleSend}
-              sx={{
-                backgroundColor: "#1565c0",
-                "&:hover": {
-                  backgroundColor: "#0d47a1",
-                },
-              }}
-            >
-              Send
-            </Button>
+                }}
+              >
+                Send
+              </Button>
+            </Stack>
           </Stack>
         </Box>
       )}
