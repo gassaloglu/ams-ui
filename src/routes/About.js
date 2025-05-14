@@ -19,14 +19,6 @@ export default function About() {
             />
 
             <Contact
-              name="Can"
-              surname="Çelenay"
-              email="cancelenay@gmail.com"
-              github="https://github.com/Brogolem35"
-              linkedin="https://linkedin.com/in/can-celenay"
-            />
-
-            <Contact
               name="Yusuf"
               surname="Gassaloğlu"
               email="yusufgassaloglu00@gmail.com"

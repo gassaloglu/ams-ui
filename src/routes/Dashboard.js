@@ -6,6 +6,8 @@ import { Center } from "../components/Styled";
 import { useAuth } from '../hooks/useAuth';
 import { AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Person, PersonAddAlt1, Warehouse } from '@mui/icons-material';
 import { EmptyPage } from '../components/Page';
+import { Poll } from '@mui/icons-material';
+
 
 const DARK_BLUE = "#1565c0";
 const DRAWER_WIDTH = "300px";
@@ -21,6 +23,12 @@ const tools = {
   addMoney: { name: "Add money to user", link: "/dashboard/add-money", icon: <AttachMoney /> },
   addFlight: { name: "Add flight", link: "/dashboard/add-flight", icon: <ConnectingAirports /> },
   checkIn: { name: "Check-in", link: "/dashboard/check-in", icon: <AirplaneTicket /> },
+  surveyResults: { 
+    name: "Survey Results", 
+    link: "http://127.0.0.1:5000/results", 
+    icon: <Poll />, 
+    external: true 
+  },
 };
 
 const toolsOfPermission = {
@@ -98,12 +106,27 @@ export function Dashboard() {
         <List>
           {
             toolsOfPermission[user.permission].map(tool =>
-              <ListItemButton key={tool.name} LinkComponent={NavLink} to={tool.link}>
-                <ListItemIcon sx={{ display: 'flex', justifyContent: 'center', color: 'white' }}>
-                  {tool.icon}
-                </ListItemIcon>
-                <ListItemText primary={tool.name} />
-              </ListItemButton>
+              tool.external ? (
+                <ListItemButton
+                  key={tool.name}
+                  component="a"
+                  href={tool.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ListItemIcon sx={{ display: 'flex', justifyContent: 'center', color: 'white' }}>
+                    {tool.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={tool.name} />
+                </ListItemButton>
+              ) : (
+                <ListItemButton key={tool.name} LinkComponent={NavLink} to={tool.link}>
+                  <ListItemIcon sx={{ display: 'flex', justifyContent: 'center', color: 'white' }}>
+                    {tool.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={tool.name} />
+                </ListItemButton>
+              )
             )
           }
         </List>
