@@ -7,6 +7,7 @@ import { Flight, FlightDetails } from '../components/Flight';
 import { Center } from '../components/Styled';
 import Error from '../components/Error';
 import Page from "../components/Page";
+import dayjs from 'dayjs';
 
 export function Flights() {
   const { from, to, date } = useParams();
@@ -43,6 +44,8 @@ export function FlightsErrorBoundary() {
 }
 
 export async function flightsLoader({ params: { from, to, date } }) {
-  const response = await axios.get(`/flight/${from}/${to}/${date}`);
+  const day = dayjs.utc(date).format();
+  const nextDay = dayjs.utc(date).add(1, 'day').format();
+  const response = await axios.get(`/flights?departure_airport=${from}&destination_airport=${to}&departure_datetime.gte=${day}&departure_datetime.lt=${nextDay}`);
   return response.data;
 }
