@@ -92,14 +92,14 @@ export function BookingErrorBoundary() {
   );
 }
 
-export async function bookingLoader({ params: { flight_number, plan } }) {
-  const [{ data: [flight] }, { data: occupation }] = await Promise.all([
-    axios.get(`/flight/${flight_number}`),
-    axios.get(`/flight/seats?id=${flight_number}`),
-  ]);
-
+export async function bookingLoader({ params: { id, plan } }) {
   if (!["Essentials", "Advantage", "Comfort"].includes(plan))
     throw new Error(`Invalid ticket type "${plan}"`);
+
+  const [{ data: flight }, { data: occupation }] = await Promise.all([
+    axios.get(`/flights/${id}`),
+    axios.get(`/flights/${id}/seats`),
+  ]);
 
   return { flight, occupation, plan };
 }

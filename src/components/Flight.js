@@ -17,11 +17,10 @@ export const getPrice = (basePrice, ticketType) => {
   }
 }
 
-export function Flight({ flight_number, departure_airport, destination_airport, departure_time, arrival_time, price }) {
+export function Flight({ id, flight_number, departure_airport, destination_airport, departure_datetime, arrival_datetime, departure_gate_number, destination_gate_number, plane_registration, price }) {
   const navigate = useNavigate();
-
   const handleClick = plan => {
-    navigate(`/booking/${flight_number}/${plan}`);
+    navigate(`/booking/${id}/${plan}`);
   }
 
   return (
@@ -35,12 +34,12 @@ export function Flight({ flight_number, departure_airport, destination_airport, 
           <Stack flex={7} direction='row' justifyContent='space-between' alignItems='center'>
             <Box>
               <Typography fontWeight='bold' color="grey.500"> {departure_airport} </Typography>
-              <Typography fontWeight='bold' variant='h5'> {dayjs(departure_time).format('LT')} </Typography>
+              <Typography fontWeight='bold' variant='h5'> {dayjs(departure_datetime).format('LT')} </Typography>
             </Box>
             <TrendingFlat />
             <Box>
               <Typography fontWeight='bold' color="grey.500"> {destination_airport} </Typography>
-              <Typography fontWeight='bold' variant='h5'> {dayjs(arrival_time).format('LT')} </Typography>
+              <Typography fontWeight='bold' variant='h5'> {dayjs(arrival_datetime).format('LT')} </Typography>
             </Box>
           </Stack>
           <Typography fontWeight='bold' flex={6} textAlign='right' variant="h5"> {price} ₺ </Typography>

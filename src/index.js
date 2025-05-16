@@ -101,7 +101,7 @@ const router = createBrowserRouter([
         errorElement: <FlightsErrorBoundary />,
       },
       {
-        path: "/booking/:flight_number/:plan",
+        path: "/booking/:id/:plan",
         loader: bookingLoader,
         element: <Protected Layout={Booking} />,
         errorElement: <BookingErrorBoundary />,
