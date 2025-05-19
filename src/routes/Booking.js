@@ -93,7 +93,7 @@ export function BookingErrorBoundary() {
 }
 
 export async function bookingLoader({ params: { id, plan } }) {
-  if (!["Essentials", "Advantage", "Comfort"].includes(plan))
+  if (!["essentials", "advantage", "comfort"].includes(plan))
     throw new Error(`Invalid ticket type "${plan}"`);
 
   const [{ data: flight }, { data: occupation }] = await Promise.all([
@@ -203,7 +203,8 @@ function Payment() {
     cardHolder: '',
     cardSurname: '',
     expiryMonth: '',
-    expiryYear: ''
+    expiryYear: '',
+    cvv: ''
   });
 
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -218,25 +219,35 @@ function Payment() {
 
   const handleClick = () => {
     const payload = {
-      ...booking,
-      birth_date: dayjs(booking.birth_date).format("YYYY-MM-DD"),
-      seat: seatToIndex(booking.seat).toString(),
-      child: Number(dayjs().diff(booking.birth_date, 'year', true) < 10).toString(),
-      disabled: booking.disabled.toString(),
-      cardDetails
+      passenger: {
+        ...booking,
+        phone: booking.phone.replaceAll(/\s/g,''),
+        birth_date: dayjs(booking.birth_date).format("YYYY-MM-DD"),
+        seat: seatToIndex(booking.seat),
+        child: Boolean(dayjs().diff(booking.birth_date, 'year', true) < 10),
+        disabled: Boolean(booking.disabled),
+      },
+      credit_card: {
+        card_number: cardDetails.cardNumber,
+        card_holder_name: cardDetails.cardHolder,
+        card_holder_surname: cardDetails.cardSurname,
+        expiration_month: cardDetails.expiryMonth,
+        expiration_year: cardDetails.expiryYear,
+        cvv: cardDetails.cvv,
+      }
     }
 
     setLoading(true);
 
-    axios.post('/ticket/payment', payload)
-      .then(({ data: { pnr } }) => {
-        setPnr(pnr);
+    axios.post('/passengers', payload)
+      .then(({ data: { pnr_no } }) => {
+        setPnr(pnr_no);
         setStatus('success');
       })
       .catch(error => {
         if (error.response) {
           setStatus('fail');
-          setFailMessage(error.response.data);
+          setFailMessage(error.response.data.message);
         } else {
           setStatus('error');
         }
@@ -305,21 +316,23 @@ function Payment() {
                   fullWidth
                   value={cardDetails.cardNumber}
                   onChange={handleCardChange('cardNumber')}
-                  placeholder="1234 5678 9012 3456"
-                  inputProps={{ maxLength: 19 }}
+                  placeholder="1234567890123456"
+                  inputProps={{ maxLength: 16 }}
                 />
-                <TextField
-                  label="Card Holder Name"
-                  fullWidth
-                  value={cardDetails.cardHolder}
-                  onChange={handleCardChange('cardHolder')}
-                />
-                <TextField
-                  label="Card Holder Surname"
-                  fullWidth
-                  value={cardDetails.cardSurname}
-                  onChange={handleCardChange('cardSurname')}
-                />
+                <Stack direction="row" spacing={2}>
+                  <TextField
+                    label="Card Holder Name"
+                    fullWidth
+                    value={cardDetails.cardHolder}
+                    onChange={handleCardChange('cardHolder')}
+                  />
+                  <TextField
+                    label="Card Holder Surname"
+                    fullWidth
+                    value={cardDetails.cardSurname}
+                    onChange={handleCardChange('cardSurname')}
+                  />
+                </Stack>
                 <Stack direction="row" spacing={2}>
                   <TextField
                     select
@@ -348,6 +361,14 @@ function Payment() {
                     ))}
                   </TextField>
                 </Stack>
+
+                <TextField
+                  label="CVV"
+                  fullWidth
+                  value={cardDetails.cvv}
+                  onChange={handleCardChange('cvv')}
+                  inputProps={{ maxLength: 3 }}
+                />
 
                 <Divider sx={{ my: 2 }} />
 

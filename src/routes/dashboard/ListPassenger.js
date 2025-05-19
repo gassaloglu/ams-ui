@@ -8,9 +8,9 @@ import { red, green, blue } from '@mui/material/colors';
 import dayjs from 'dayjs';
 
 const styles = {
-  Essentials: { backgroundColor: blue[500], color: 'white' },
-  Advantage: { backgroundColor: green[500], color: 'white' },
-  Comfort: { backgroundColor: red[500], color: 'white' },
+  essentials: { backgroundColor: blue[500], color: 'white' },
+  advantage: { backgroundColor: green[500], color: 'white' },
+  comfort: { backgroundColor: red[500], color: 'white' },
 }
 
 const Fare = ({ type }) => (

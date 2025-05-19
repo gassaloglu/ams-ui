@@ -8,11 +8,11 @@ const PRICE_CONSTANT = 1.2;
 
 export const getPrice = (basePrice, ticketType) => {
   switch (ticketType) {
-    case 'Essentials':
+    case 'essentials':
       return parseFloat(basePrice).toFixed(2);
-    case 'Advantage':
+    case 'advantage':
       return (parseFloat(basePrice) * PRICE_CONSTANT).toFixed(2);
-    case 'Comfort':
+    case 'comfort':
       return (parseFloat(basePrice) * PRICE_CONSTANT * PRICE_CONSTANT).toFixed(2);
   }
 }
@@ -48,16 +48,16 @@ export function Flight({ id, flight_number, departure_airport, destination_airpo
 
       <AccordionDetails>
         <Stack spacing={1} sx={{ paddingBottom: 1 }} direction='row' justifyContent='space-evenly'>
-          <Plan label='essentials' dash={blue[500]} price={getPrice(price, 'Essentials')} onClick={() => handleClick('Essentials')}>
+          <Plan label='essentials' dash={blue[500]} price={getPrice(price, 'essentials')} onClick={() => handleClick('essentials')}>
             <Benefit icon={<Luggage />}> 15 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}> Seat Selection </Benefit>
           </Plan>
-          <Plan label='advantage' dash={green[500]} price={getPrice(price, 'Advantage')} onClick={() => handleClick('Advantage')}>
+          <Plan label='advantage' dash={green[500]} price={getPrice(price, 'advantage')} onClick={() => handleClick('advantage')}>
             <Benefit icon={<Luggage />}> 25 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}> Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
           </Plan>
-          <Plan label='comfort' dash={red[500]} price={getPrice(price, 'Comfort')} onClick={() => handleClick('Comfort')}>
+          <Plan label='comfort' dash={red[500]} price={getPrice(price, 'comfort')} onClick={() => handleClick('comfort')}>
             <Benefit icon={<Luggage />}> 45 Kg. Luggage </Benefit>
             <Benefit icon={<FlightClass />}>  Seat Selection </Benefit>
             <Benefit icon={<Restaurant />}> Sandwich </Benefit>
