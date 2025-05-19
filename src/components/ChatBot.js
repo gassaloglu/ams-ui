@@ -56,7 +56,7 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi there!👋 How can I assist you?" },
+    { sender: "model", text: "Hi there!👋 How can I assist you?" },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -87,7 +87,7 @@ export default function Chatbot() {
       // Add temporary loading message
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: "...", isLoading: true },
+        { sender: "model", text: "...", isLoading: true },
       ]);
 
       try {
@@ -96,7 +96,7 @@ export default function Chatbot() {
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: prompt }),
+            body: JSON.stringify({ prompt: prompt, history: messages }),
           },
         );
         const data = await response.json();
@@ -104,7 +104,7 @@ export default function Chatbot() {
         // Remove loading message and add actual response
         setMessages((prev) => [
           ...prev.filter((msg) => !msg.isLoading),
-          { sender: "bot", text: data.output },
+          { sender: "model", text: data.output },
         ]);
       } catch (error) {
         console.error("Error connecting to chatbot API:", error);
@@ -112,7 +112,7 @@ export default function Chatbot() {
         setMessages((prev) => [
           ...prev.filter((msg) => !msg.isLoading),
           {
-            sender: "bot",
+            sender: "model",
             text: "Sorry, I encountered an error. Please try again.",
           },
         ]);
@@ -201,7 +201,7 @@ export default function Chatbot() {
                 >
                   {message.isLoading ? (
                     <CircularProgress size={20} />
-                  ) : message.sender === "bot" ? (
+                  ) : message.sender === "model" ? (
                     <Box sx={{ lineHeight: 1.3 }}>
                       {formatBotMessage(message.text)}
                     </Box>
