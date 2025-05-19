@@ -5,8 +5,8 @@ import { useImmer } from 'use-immer';
 import { axios } from '../index';
 import dayjs from "dayjs";
 
-import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography, Grid } from "@mui/material";
-import { ArrowRight, ErrorOutline, CheckCircleOutline, WarningAmber } from '@mui/icons-material';
+import { Box, Button, Divider, Stack, Step, StepButton, Stepper, Typography, Grid, TextField, MenuItem, Paper } from "@mui/material";
+import { ArrowRight, ErrorOutline, CheckCircleOutline, WarningAmber, CreditCard } from '@mui/icons-material';
 
 import Page from "../components/Page";
 import PassengerForm from '../components/PassengerForm';
@@ -31,13 +31,13 @@ export function Booking() {
   const [step, setStep] = useState(0);
   const [booking, updateBooking] = useImmer({
     flight_number: flight.flight_number,
-    ticket_type: plan,
+    fare_type: plan.toLowerCase(),
     national_id: '',
     name: '',
     surname: '',
     email: '',
     phone: '',
-    gender: 'Male',
+    gender: 'male',
     disabled: 0,
     seat: null,
     birth_date: null,
@@ -169,8 +169,20 @@ function Steps() {
   )
 }
 
-const Detail = ({ label, children }) =>
-  <Typography> <strong>{label}</strong>: {children}</Typography>;
+const Detail = ({ label, children }) => (
+  <Box sx={{ 
+    display: 'flex', 
+    justifyContent: 'space-between', 
+    alignItems: 'center'
+  }}>
+    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
+      {label}
+    </Typography>
+    <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+      {children}
+    </Typography>
+  </Box>
+);
 
 const Status = ({ Icon, children }) => (
   <Stack sx={{ minHeight: '200px' }} alignItems='center'>
@@ -186,6 +198,23 @@ function Payment() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
   const [failMessage, setFailMessage] = useState('');
+  const [cardDetails, setCardDetails] = useState({
+    cardNumber: '',
+    cardHolder: '',
+    cardSurname: '',
+    expiryMonth: '',
+    expiryYear: ''
+  });
+
+  const months = Array.from({ length: 12 }, (_, i) => i + 1);
+  const years = Array.from({ length: 21 }, (_, i) => i + 25);
+
+  const handleCardChange = (field) => (event) => {
+    setCardDetails(prev => ({
+      ...prev,
+      [field]: event.target.value
+    }));
+  };
 
   const handleClick = () => {
     const payload = {
@@ -194,6 +223,7 @@ function Payment() {
       seat: seatToIndex(booking.seat).toString(),
       child: Number(dayjs().diff(booking.birth_date, 'year', true) < 10).toString(),
       disabled: booking.disabled.toString(),
+      cardDetails
     }
 
     setLoading(true);
@@ -263,34 +293,167 @@ function Payment() {
           Overview of your booking details
         </Typography>
 
-        <Stack alignSelf='stretch' direction='row' justifyContent='space-evenly' >
-          <Box>
-            <Typography variant='h6'> Passenger </Typography>
-            <Divider sx={{ my: .5 }} />
-            <Detail label="Fullname">{booking.name + " " + booking.surname}</Detail>
-            <Detail label="National ID">{booking.national_id}</Detail>
-            <Detail label="Phone">{booking.phone}</Detail>
-            <Detail label="Email">{booking.email}</Detail>
-            <Detail label="Disabled">{booking.disabled ? "Yes" : "No"}</Detail>
-          </Box>
-          <Box>
-            <Typography variant='h6'> Flight </Typography>
-            <Divider sx={{ my: .5 }} />
-            <Detail label="From">{flight.departure_airport}</Detail>
-            <Detail label="To">{flight.destination_airport}</Detail>
-            <Detail label="Date">{dayjs(flight.departure_time).format("L LT")}</Detail>
-            <Detail label="Ticket type">{booking.ticket_type}</Detail>
-            <Detail label="Seat">{seatToAlphaIndex(booking.seat)}</Detail>
-          </Box>
+        <Stack direction="row" spacing={4} sx={{ width: '100%', maxWidth: '1200px' }} alignItems="stretch">
+          <Stack spacing={3} sx={{ flex: 1 }} alignItems="stretch">
+            <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+              <Stack spacing={3}>
+                <Typography variant='h6' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CreditCard /> Payment Details
+                </Typography>
+                <TextField
+                  label="Card Number"
+                  fullWidth
+                  value={cardDetails.cardNumber}
+                  onChange={handleCardChange('cardNumber')}
+                  placeholder="1234 5678 9012 3456"
+                  inputProps={{ maxLength: 19 }}
+                />
+                <TextField
+                  label="Card Holder Name"
+                  fullWidth
+                  value={cardDetails.cardHolder}
+                  onChange={handleCardChange('cardHolder')}
+                />
+                <TextField
+                  label="Card Holder Surname"
+                  fullWidth
+                  value={cardDetails.cardSurname}
+                  onChange={handleCardChange('cardSurname')}
+                />
+                <Stack direction="row" spacing={2}>
+                  <TextField
+                    select
+                    label="Expiry Month"
+                    fullWidth
+                    value={cardDetails.expiryMonth}
+                    onChange={handleCardChange('expiryMonth')}
+                  >
+                    {months.map((month) => (
+                      <MenuItem key={month} value={month}>
+                        {month.toString().padStart(2, '0')}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    select
+                    label="Expiry Year"
+                    fullWidth
+                    value={cardDetails.expiryYear}
+                    onChange={handleCardChange('expiryYear')}
+                  >
+                    {years.map((year) => (
+                      <MenuItem key={year} value={year}>
+                        {year}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Stack>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  bgcolor: 'grey.50',
+                  p: 2,
+                  borderRadius: 1
+                }}>
+                  <Typography variant='h6' sx={{ 
+                    color: 'text.secondary',
+                    fontWeight: 'bold'
+                  }}> 
+                    Total Amount
+                  </Typography>
+                  <Typography variant='h5' sx={{ 
+                    fontWeight: 'bold',
+                    color: 'primary.main'
+                  }}>
+                    {getPrice(flight.price, booking.fare_type)} ₺
+                  </Typography>
+                </Box>
+
+                <LoadingButton 
+                  loading={loading} 
+                  variant="contained" 
+                  onClick={handleClick}
+                  size="large"
+                  fullWidth
+                  sx={{ mt: 2 }}
+                >
+                  Complete Payment
+                </LoadingButton>
+              </Stack>
+            </Paper>
+          </Stack>
+
+          <Stack spacing={3} sx={{ flex: 1 }} alignItems="stretch">
+            <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+              <Stack spacing={3}>
+                <Typography variant='h6' sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1,
+                  fontWeight: 'bold'
+                }}> 
+                  <CreditCard /> Booking Summary 
+                </Typography>
+                
+                <Box sx={{ 
+                  bgcolor: 'grey.50', 
+                  p: 2, 
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}>
+                  <Typography variant='subtitle1' sx={{ 
+                    fontWeight: 'bold',
+                    mb: 1,
+                    color: 'text.secondary',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}> 
+                    Passenger Information
+                  </Typography>
+                  <Stack spacing={2}>
+                    <Detail label="Fullname">{booking.name + " " + booking.surname}</Detail>
+                    <Detail label="National ID">{booking.national_id}</Detail>
+                    <Detail label="Phone">{booking.phone}</Detail>
+                    <Detail label="Email">{booking.email}</Detail>
+                    <Detail label="Disabled">{booking.disabled ? "Yes" : "No"}</Detail>
+                  </Stack>
+                </Box>
+
+                <Box sx={{ 
+                  bgcolor: 'grey.50', 
+                  p: 2, 
+                  borderRadius: 1,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}>
+                  <Typography variant='subtitle1' sx={{ 
+                    fontWeight: 'bold',
+                    mb: 1,
+                    color: 'text.secondary',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}> 
+                    Flight Details
+                  </Typography>
+                  <Stack spacing={2}>
+                    <Detail label="From">{flight.departure_airport}</Detail>
+                    <Detail label="To">{flight.destination_airport}</Detail>
+                    <Detail label="Date">{dayjs(flight.departure_time).format("L LT")}</Detail>
+                    <Detail label="Ticket type">{booking.fare_type}</Detail>
+                    <Detail label="Seat">{seatToAlphaIndex(booking.seat)}</Detail>
+                  </Stack>
+                </Box>
+              </Stack>
+            </Paper>
+          </Stack>
         </Stack>
-
-        <Typography variant='h6'>
-          Total price: {getPrice(flight.price, booking.ticket_type)} ₺
-        </Typography>
-
-        <LoadingButton loading={loading} variant="contained" onClick={handleClick}>
-          Purchase
-        </LoadingButton>
       </Stack>
     );
   }
