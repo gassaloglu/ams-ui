@@ -20,9 +20,10 @@ import {
   Flight as FlightIcon,
 } from "@mui/icons-material";
 
-// FlightCard component for displaying single flight with navigation
-const FlightCard = ({ flights }) => {
+// FlightCards component for displaying flight options as cards with navigation
+const FlightCards = ({ flights }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const flight = flights[currentIndex];
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : flights.length - 1));
@@ -51,10 +52,6 @@ const FlightCard = ({ flights }) => {
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours}h ${minutes}m`;
   };
-
-  if (flights.length === 0) return null;
-
-  const flight = flights[currentIndex];
 
   return (
     <Box sx={{ position: "relative", width: "100%", my: 2 }}>
@@ -102,7 +99,7 @@ const FlightCard = ({ flights }) => {
             <Stack direction="row" alignItems="center" spacing={1}>
               <AccessTimeIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {formatDateTime(flight.departure_datetime)}
+                Departure: {formatDateTime(flight.departure_datetime)}
               </Typography>
             </Stack>
 
@@ -118,6 +115,7 @@ const FlightCard = ({ flights }) => {
                 sx={{ transform: "rotate(90deg)" }}
               />
               <Typography variant="body2">
+                Duration:{" "}
                 {calculateDuration(
                   flight.departure_datetime,
                   flight.arrival_datetime,
@@ -128,7 +126,7 @@ const FlightCard = ({ flights }) => {
             <Stack direction="row" alignItems="center" spacing={1}>
               <AccessTimeIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {formatDateTime(flight.arrival_datetime)}
+                Arrival: {formatDateTime(flight.arrival_datetime)}
               </Typography>
             </Stack>
           </Stack>
@@ -150,7 +148,7 @@ const FlightCard = ({ flights }) => {
               color="primary"
               sx={{ fontWeight: "bold" }}
             >
-              ${flight.price || "N/A"}
+              Price: ${flight.price || "N/A"}
             </Typography>
           </Stack>
 
@@ -160,7 +158,7 @@ const FlightCard = ({ flights }) => {
             textAlign="center"
             sx={{ mt: 1 }}
           >
-            Flight {currentIndex + 1} of {flights.length}
+            Flight option {currentIndex + 1} of {flights.length}
           </Typography>
         </CardContent>
       </Card>
@@ -184,37 +182,70 @@ const FlightCard = ({ flights }) => {
   );
 };
 
-// Helper function to extract flights from text
-const extractFlights = (text) => {
-  const jsonMatches = text.match(/\[.*?\]/gs) || [];
-  const flights = [];
-  let remainingText = text;
+// Updated formatBotMessage function to handle multiple JSON flight arrays
+// Updated formatBotMessage function to maintain original order of text and flights
+const formatBotMessage = (text) => {
+  // Split the text into parts, alternating between text and JSON arrays
+  const parts = [];
+  let lastIndex = 0;
 
-  jsonMatches.forEach((match) => {
+  // Find all JSON arrays in the text
+  const jsonRegex = /(\[.*?\])/gs;
+  let match;
+
+  while ((match = jsonRegex.exec(text)) !== null) {
+    // Add text before the JSON
+    if (match.index > lastIndex) {
+      parts.push({
+        type: "text",
+        content: text.substring(lastIndex, match.index),
+      });
+    }
+
+    // Try to parse the JSON
     try {
-      const parsed = JSON.parse(match);
-      if (Array.isArray(parsed)) {
-        flights.push(...parsed);
-        remainingText = remainingText.replace(match, "");
+      const flights = JSON.parse(match[0]);
+      if (Array.isArray(flights)) {
+        parts.push({
+          type: "flights",
+          content: flights,
+        });
       }
     } catch (e) {
-      console.error("Error parsing flight data:", e);
+      // If parsing fails, treat it as regular text
+      parts.push({
+        type: "text",
+        content: match[0],
+      });
     }
-  });
 
-  return { flights, remainingText };
-};
+    lastIndex = match.index + match[0].length;
+  }
 
-// Format bot message function
-const formatBotMessage = (text) => {
-  const { flights, remainingText } = extractFlights(text);
+  // Add any remaining text after the last JSON
+  if (lastIndex < text.length) {
+    parts.push({
+      type: "text",
+      content: text.substring(lastIndex),
+    });
+  }
 
   return (
     <>
-      {remainingText.trim() && (
-        <Typography sx={{ mb: 2, lineHeight: 1.6 }}>{remainingText}</Typography>
-      )}
-      {flights.length > 0 && <FlightCard flights={flights} />}
+      {parts.map((part, index) => {
+        if (part.type === "text" && part.content.trim()) {
+          return (
+            <Typography key={`text-${index}`} sx={{ mb: 2, lineHeight: 1.6 }}>
+              {part.content}
+            </Typography>
+          );
+        } else if (part.type === "flights") {
+          return (
+            <FlightCards key={`flights-${index}`} flights={part.content} />
+          );
+        }
+        return null;
+      })}
     </>
   );
 };
