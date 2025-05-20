@@ -207,17 +207,89 @@ function Payment() {
     cvv: ''
   });
 
+  const [cardErrors, setCardErrors] = useState({
+    cardNumber: '',
+    cardHolder: '',
+    cardSurname: '',
+    expiryMonth: '',
+    expiryYear: '',
+    cvv: ''
+  });
+
   const months = Array.from({ length: 12 }, (_, i) => i + 1);
   const years = Array.from({ length: 21 }, (_, i) => i + 25);
 
+  const validateCardNumber = (number) => {
+    if (!number) return 'Card number is required';
+    if (!/^\d{16}$/.test(number)) return 'Card number must be 16 digits';
+    return '';
+  };
+
+  const validateName = (name) => {
+    if (!name) return 'Name is required';
+    if (!/^[a-zA-Z\s-]+$/.test(name)) return 'Name can only contain letters, spaces and hyphens';
+    return '';
+  };
+
+  const validateCVV = (cvv) => {
+    if (!cvv) return 'CVV is required';
+    if (!/^\d{3}$/.test(cvv)) return 'CVV must be 3 digits';
+    return '';
+  };
+
+  const validateExpiry = (month, year) => {
+    if (!month) return 'Expiry month is required';
+    if (!year) return 'Expiry year is required';
+    return '';
+  };
+
   const handleCardChange = (field) => (event) => {
+    const value = event.target.value;
     setCardDetails(prev => ({
       ...prev,
-      [field]: event.target.value
+      [field]: value
+    }));
+
+    // Validate the field
+    let error = '';
+    switch (field) {
+      case 'cardNumber':
+        error = validateCardNumber(value);
+        break;
+      case 'cardHolder':
+        error = validateName(value);
+        break;
+      case 'cardSurname':
+        error = validateName(value);
+        break;
+      case 'cvv':
+        error = validateCVV(value);
+        break;
+      case 'expiryMonth':
+      case 'expiryYear':
+        error = validateExpiry(
+          field === 'expiryMonth' ? value : cardDetails.expiryMonth,
+          field === 'expiryYear' ? value : cardDetails.expiryYear
+        );
+        break;
+    }
+
+    setCardErrors(prev => ({
+      ...prev,
+      [field]: error
     }));
   };
 
+  const isFormValid = () => {
+    return !Object.values(cardErrors).some(error => error !== '') &&
+           Object.values(cardDetails).every(value => value !== '');
+  };
+
   const handleClick = () => {
+    if (!isFormValid()) {
+      return;
+    }
+
     const payload = {
       passenger: {
         ...booking,
@@ -318,6 +390,8 @@ function Payment() {
                   onChange={handleCardChange('cardNumber')}
                   placeholder="1234567890123456"
                   inputProps={{ maxLength: 16 }}
+                  error={!!cardErrors.cardNumber}
+                  helperText={cardErrors.cardNumber}
                 />
                 <Stack direction="row" spacing={2}>
                   <TextField
@@ -325,12 +399,16 @@ function Payment() {
                     fullWidth
                     value={cardDetails.cardHolder}
                     onChange={handleCardChange('cardHolder')}
+                    error={!!cardErrors.cardHolder}
+                    helperText={cardErrors.cardHolder}
                   />
                   <TextField
                     label="Card Holder Surname"
                     fullWidth
                     value={cardDetails.cardSurname}
                     onChange={handleCardChange('cardSurname')}
+                    error={!!cardErrors.cardSurname}
+                    helperText={cardErrors.cardSurname}
                   />
                 </Stack>
                 <Stack direction="row" spacing={2}>
@@ -340,6 +418,8 @@ function Payment() {
                     fullWidth
                     value={cardDetails.expiryMonth}
                     onChange={handleCardChange('expiryMonth')}
+                    error={!!cardErrors.expiryMonth}
+                    helperText={cardErrors.expiryMonth}
                   >
                     {months.map((month) => (
                       <MenuItem key={month} value={month}>
@@ -353,6 +433,8 @@ function Payment() {
                     fullWidth
                     value={cardDetails.expiryYear}
                     onChange={handleCardChange('expiryYear')}
+                    error={!!cardErrors.expiryYear}
+                    helperText={cardErrors.expiryYear}
                   >
                     {years.map((year) => (
                       <MenuItem key={year} value={year}>
@@ -368,6 +450,8 @@ function Payment() {
                   value={cardDetails.cvv}
                   onChange={handleCardChange('cvv')}
                   inputProps={{ maxLength: 3 }}
+                  error={!!cardErrors.cvv}
+                  helperText={cardErrors.cvv}
                 />
 
                 <Divider sx={{ my: 2 }} />
@@ -401,6 +485,7 @@ function Payment() {
                   size="large"
                   fullWidth
                   sx={{ mt: 2 }}
+                  disabled={!isFormValid()}
                 >
                   Complete Payment
                 </LoadingButton>
