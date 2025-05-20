@@ -18,11 +18,50 @@ import {
   ArrowForwardIos as ArrowForwardIosIcon,
   AccessTime as AccessTimeIcon,
   Flight as FlightIcon,
+  ConfirmationNumber as ConfirmationNumberIcon, // For booking button
 } from "@mui/icons-material";
 
-// FlightCard component for displaying single flight with navigation
-const FlightCard = ({ flights }) => {
+// Helper function to apply basic Markdown to text
+const applyMarkdown = (markdownText) => {
+  if (!markdownText) return "";
+  let html = markdownText;
+
+  // Bold: **text** or __text__
+  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/__(.*?)__/g, "<strong>$1</strong>");
+
+  // Italics: *text* or _text_ (ensure not part of bold)
+  html = html.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
+  html = html.replace(/(?<!_)_(?!_)(.*?)(?<!_)_(?!_)/g, "<em>$1</em>");
+
+  // Strikethrough: ~~text~~
+  html = html.replace(/~~(.*?)~~/g, "<del>$1</del>");
+  // Inline code: `text`
+  html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+
+  return html;
+};
+
+// FlightCards component
+const FlightCards = ({ flights }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  if (!Array.isArray(flights) || flights.length === 0) {
+    return (
+      <Typography sx={{ my: 2, textAlign: "center", color: "text.secondary" }}>
+        No flight information to display.
+      </Typography>
+    );
+  }
+  const flight = flights[currentIndex];
+
+  if (!flight || typeof flight !== "object" || !flight.flight_number) {
+    return (
+      <Typography sx={{ my: 2, textAlign: "center", color: "text.secondary" }}>
+        Invalid flight data encountered.
+      </Typography>
+    );
+  }
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev > 0 ? prev - 1 : flights.length - 1));
@@ -52,23 +91,32 @@ const FlightCard = ({ flights }) => {
     return `${hours}h ${minutes}m`;
   };
 
-  if (flights.length === 0) return null;
-
-  const flight = flights[currentIndex];
+  const handleBookNow = () => {
+    // Placeholder for actual reservation logic
+    alert(
+      `Booking flight ${flight.flight_number} from ${flight.departure_airport} to ${flight.destination_airport}.\nPrice: $${flight.price || "N/A"}`,
+    );
+    // In a real app, this would likely navigate to a booking page or open a modal
+    // TODO
+    //
+    //
+  };
 
   return (
     <Box sx={{ position: "relative", width: "100%", my: 2 }}>
       <IconButton
         onClick={handlePrev}
+        disabled={flights.length <= 1}
         sx={{
           position: "absolute",
-          left: -20,
+          left: { xs: -10, sm: -20 },
           top: "50%",
           transform: "translateY(-50%)",
           zIndex: 1,
           backgroundColor: "white",
-          boxShadow: 1,
-          "&:hover": { backgroundColor: "grey.100" },
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          "&:hover": { backgroundColor: "grey.200" },
+          visibility: flights.length <= 1 ? "hidden" : "visible",
         }}
       >
         <ArrowBackIosIcon fontSize="small" />
@@ -78,12 +126,19 @@ const FlightCard = ({ flights }) => {
         sx={{
           width: "100%",
           border: "1px solid #e0e0e0",
-          borderRadius: "8px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
-        <CardContent>
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
+        <CardContent sx={{ padding: "16px !important", flexGrow: 1 }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1.5}
+            sx={{ mb: 1.5 }}
+          >
             <Typography
               variant="h6"
               component="div"
@@ -96,13 +151,13 @@ const FlightCard = ({ flights }) => {
             </Typography>
           </Stack>
 
-          <Divider sx={{ my: 1 }} />
+          <Divider sx={{ my: 1.5 }} />
 
-          <Stack spacing={1}>
+          <Stack spacing={1.5}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <AccessTimeIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {formatDateTime(flight.departure_datetime)}
+                Departure: {formatDateTime(flight.departure_datetime)}
               </Typography>
             </Stack>
 
@@ -110,14 +165,15 @@ const FlightCard = ({ flights }) => {
               direction="row"
               alignItems="center"
               spacing={1}
-              sx={{ ml: 3 }}
+              sx={{ pl: 0 }}
             >
               <FlightIcon
                 fontSize="small"
                 color="action"
-                sx={{ transform: "rotate(90deg)" }}
+                sx={{ transform: "rotate(90deg)", ml: 0.2, mr: 0.8 }}
               />
               <Typography variant="body2">
+                Duration:{" "}
                 {calculateDuration(
                   flight.departure_datetime,
                   flight.arrival_datetime,
@@ -128,7 +184,7 @@ const FlightCard = ({ flights }) => {
             <Stack direction="row" alignItems="center" spacing={1}>
               <AccessTimeIcon fontSize="small" color="action" />
               <Typography variant="body2">
-                {formatDateTime(flight.arrival_datetime)}
+                Arrival: {formatDateTime(flight.arrival_datetime)}
               </Typography>
             </Stack>
           </Stack>
@@ -140,42 +196,55 @@ const FlightCard = ({ flights }) => {
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="body2" color="text.secondary">
-              {flight.departure_gate_number
-                ? `Gate ${flight.departure_gate_number}`
-                : "Gate not assigned"}
-            </Typography>
             <Typography
               variant="h6"
-              color="primary"
+              color="primary.main"
               sx={{ fontWeight: "bold" }}
             >
-              ${flight.price || "N/A"}
+              Price: {flight.price || "N/A"} TRY
             </Typography>
+            {/* Future elements like "Seats left" could go here */}
           </Stack>
 
-          <Typography
-            variant="caption"
-            display="block"
-            textAlign="center"
-            sx={{ mt: 1 }}
-          >
-            Flight {currentIndex + 1} of {flights.length}
-          </Typography>
+          {flights.length > 1 && (
+            <Typography
+              variant="caption"
+              display="block"
+              textAlign="center"
+              sx={{ mt: 2, color: "text.secondary" }}
+            >
+              Flight option {currentIndex + 1} of {flights.length}
+            </Typography>
+          )}
         </CardContent>
+        <Divider />
+        <Box sx={{ p: 2, pt: 1.5 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            startIcon={<ConfirmationNumberIcon />}
+            onClick={handleBookNow}
+            sx={{ fontWeight: "bold", borderRadius: "8px" }}
+          >
+            Book Now
+          </Button>
+        </Box>
       </Card>
 
       <IconButton
         onClick={handleNext}
+        disabled={flights.length <= 1}
         sx={{
           position: "absolute",
-          right: -20,
+          right: { xs: -10, sm: -20 },
           top: "50%",
           transform: "translateY(-50%)",
           zIndex: 1,
           backgroundColor: "white",
-          boxShadow: 1,
-          "&:hover": { backgroundColor: "grey.100" },
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          "&:hover": { backgroundColor: "grey.200" },
+          visibility: flights.length <= 1 ? "hidden" : "visible",
         }}
       >
         <ArrowForwardIosIcon fontSize="small" />
@@ -184,37 +253,83 @@ const FlightCard = ({ flights }) => {
   );
 };
 
-// Helper function to extract flights from text
-const extractFlights = (text) => {
-  const jsonMatches = text.match(/\[.*?\]/gs) || [];
-  const flights = [];
-  let remainingText = text;
-
-  jsonMatches.forEach((match) => {
-    try {
-      const parsed = JSON.parse(match);
-      if (Array.isArray(parsed)) {
-        flights.push(...parsed);
-        remainingText = remainingText.replace(match, "");
-      }
-    } catch (e) {
-      console.error("Error parsing flight data:", e);
-    }
-  });
-
-  return { flights, remainingText };
-};
-
-// Format bot message function
 const formatBotMessage = (text) => {
-  const { flights, remainingText } = extractFlights(text);
+  const parts = [];
+  let lastIndex = 0;
+
+  const combinedRegex = /```json\s*?\n([\s\S]*?)\n```|(\[[\s\S]*?\])/gs;
+  let match;
+
+  while ((match = combinedRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({
+        type: "text",
+        content: text.substring(lastIndex, match.index),
+      });
+    }
+
+    const jsonStringContent = match[1] || match[2];
+
+    if (jsonStringContent) {
+      try {
+        const potentialData = JSON.parse(jsonStringContent.trim());
+        if (
+          Array.isArray(potentialData) &&
+          potentialData.length > 0 &&
+          potentialData.every(
+            (f) =>
+              typeof f === "object" &&
+              f !== null &&
+              "flight_number" in f &&
+              "departure_airport" in f &&
+              "destination_airport" in f &&
+              "departure_datetime" in f &&
+              "arrival_datetime" in f,
+          )
+        ) {
+          parts.push({
+            type: "flights",
+            content: potentialData,
+          });
+        }
+      } catch (e) {
+        // console.warn("JSON parsing failed or not flight data:", jsonStringContent, e);
+      }
+    }
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({
+      type: "text",
+      content: text.substring(lastIndex),
+    });
+  }
 
   return (
     <>
-      {remainingText.trim() && (
-        <Typography sx={{ mb: 2, lineHeight: 1.6 }}>{remainingText}</Typography>
-      )}
-      {flights.length > 0 && <FlightCard flights={flights} />}
+      {parts.map((part, index) => {
+        if (part.type === "text" && part.content.trim()) {
+          const htmlContent = applyMarkdown(part.content.trim());
+          return (
+            <Typography
+              key={`text-${index}`}
+              component="div"
+              sx={{
+                lineHeight: 1.6,
+                whiteSpace: "pre-wrap",
+                wordWrap: "break-word",
+              }}
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+            />
+          );
+        } else if (part.type === "flights") {
+          return (
+            <FlightCards key={`flights-${index}`} flights={part.content} />
+          );
+        }
+        return null;
+      })}
     </>
   );
 };
@@ -224,7 +339,11 @@ export default function Chatbot() {
   const [input, setInput] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "model", text: "Hi there!👋 How can I assist you?" },
+    {
+      sender: "model",
+      text: "Hi there!👋 How can I assist you today?",
+      key: `model-initial-${Date.now()}`,
+    },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
@@ -236,57 +355,92 @@ export default function Chatbot() {
     "What is the biggest plane you have?",
   ];
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (isOpen) {
+      scrollToBottom();
+    }
+  }, [messages, isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSend = async (prompt = input) => {
-    if (prompt.trim()) {
-      const newMessages = [...messages, { sender: "user", text: prompt }];
-      setMessages(newMessages);
+  const handleSend = async (promptArg) => {
+    const promptToSend =
+      typeof promptArg === "string" && promptArg.trim() !== ""
+        ? promptArg.trim()
+        : input.trim();
+
+    if (promptToSend) {
+      const userMessage = {
+        sender: "user",
+        text: promptToSend,
+        key: `user-${Date.now()}`,
+      };
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
       setInput("");
       setIsLoading(true);
 
-      // Add temporary loading message
-      setMessages((prev) => [
-        ...prev,
-        { sender: "model", text: "...", isLoading: true },
+      const loadingMessageKey = `model-loading-${Date.now()}`;
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: "model",
+          text: "...",
+          isLoading: true,
+          key: loadingMessageKey,
+        },
       ]);
 
       try {
+        const historyForAPI = messages
+          .filter((msg) => !msg.isLoading)
+          .slice(-10)
+          .map((msg) => ({
+            role: msg.sender === "user" ? "user" : "model",
+            content: msg.text,
+          }));
+
         const response = await fetch(
           "http://127.0.0.1:8081/api/v1/query_model",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: prompt, history: messages }),
+            body: JSON.stringify({
+              prompt: promptToSend,
+              history: historyForAPI,
+            }),
           },
         );
+        if (!response.ok) {
+          const errorData = await response.text();
+          throw new Error(`API error: ${response.status} - ${errorData}`);
+        }
         const data = await response.json();
 
-        // Remove loading message and add actual response
-        setMessages((prev) => [
-          ...prev.filter((msg) => !msg.isLoading),
-          { sender: "model", text: data.output },
+        setMessages((prevMessages) => [
+          ...prevMessages.filter((msg) => msg.key !== loadingMessageKey),
+          {
+            sender: "model",
+            text: data.output || "Sorry, I didn't get a valid response.",
+            key: `model-${Date.now()}`,
+          },
         ]);
       } catch (error) {
         console.error("Error connecting to chatbot API:", error);
-        // Replace loading message with error message
-        setMessages((prev) => [
-          ...prev.filter((msg) => !msg.isLoading),
+        setMessages((prevMessages) => [
+          ...prevMessages.filter((msg) => msg.key !== loadingMessageKey),
           {
             sender: "model",
             text: "Sorry, I encountered an error. Please try again.",
+            key: `model-error-${Date.now()}`,
           },
         ]);
       } finally {
         setIsLoading(false);
       }
+    } else {
+      setInput("");
     }
   };
 
@@ -300,96 +454,161 @@ export default function Chatbot() {
         onClick={toggleChatbot}
         sx={{
           position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          backgroundColor: "#1565c0",
+          bottom: "30px",
+          right: "30px",
+          backgroundColor: "#007AFF",
           color: "white",
-          width: "60px",
-          height: "60px",
+          width: "64px",
+          height: "64px",
           borderRadius: "50%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          zIndex: 1100,
+          zIndex: 1300,
+          boxShadow: "0 4px 12px rgba(0, 122, 255, 0.3)",
+          transition:
+            "transform 0.2s ease-in-out, background-color 0.2s ease-in-out",
           "&:hover": {
-            backgroundColor: "#0d47a1",
+            backgroundColor: "#005ecb",
+            transform: "scale(1.05)",
           },
         }}
       >
-        <SmartToyIcon sx={{ fontSize: "30px" }} />
+        <SmartToyIcon sx={{ fontSize: "32px" }} />
       </IconButton>
 
+      {/* If you want the Slide transition for the chat window, you'd wrap this Box:
+          <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit timeout={300}>
+            <Box sx={{...}}> ... </Box>
+          </Slide>
+      */}
       {isOpen && (
         <Box
           sx={{
             position: "fixed",
-            bottom: "90px",
-            right: "20px",
-            width: "600px",
-            maxWidth: "100%",
-            backgroundColor: "#f9f9f9",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-            p: 2,
-            borderRadius: "8px",
-            zIndex: 1000,
+            bottom: "110px",
+            right: "30px",
+            width: { xs: "calc(100vw - 30px)", sm: "580px" }, // Made popup wider
+            height: "75vh", // Made popup taller
+            maxHeight: "700px", // Adjusted maxHeight
+            backgroundColor: "#ffffff",
+            boxShadow: "0 5px 15px rgba(0,0,0,0.12)",
+            p: 0,
+            borderRadius: "16px",
+            zIndex: 1200,
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
           }}
         >
-          <Stack direction="column" spacing={2}>
-            <Box
+          <Box
+            sx={{
+              py: 1.5,
+              px: 2,
+              borderBottom: "1px solid #E5E7EB",
+              backgroundColor: "#F9FAFB",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
+            }}
+          >
+            <Typography
+              variant="h6"
               sx={{
-                height: "300px",
-                overflowY: "auto",
-                mb: 2,
-                p: 1,
-                backgroundColor: "#f5f5f5",
-                borderRadius: "4px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
+                color: "#1F2937",
+                textAlign: "center",
+                fontWeight: 600,
+                fontSize: "1.1rem",
               }}
             >
-              {messages.map((message, index) => (
+              Flight Assistant
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              flexGrow: 1,
+              overflowY: "auto",
+              p: "16px",
+              backgroundColor: "#F3F4F6",
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+            }}
+          >
+            {messages.map((message) => (
+              <Box
+                key={message.key}
+                sx={{
+                  display: "flex",
+                  justifyContent:
+                    message.sender === "user" ? "flex-end" : "flex-start",
+                }}
+              >
                 <Box
-                  key={index}
                   sx={{
-                    textAlign: message.sender === "user" ? "right" : "left",
-                    alignSelf:
-                      message.sender === "user" ? "flex-end" : "flex-start",
                     backgroundColor:
-                      message.sender === "user" ? "#1E3A8A" : "#E2E8F0",
-                    color: message.sender === "user" ? "#ffffff" : "#1E293B",
-                    mb: 0,
-                    p: 1.5,
-                    borderRadius: "8px",
-                    display: "inline-flex",
-                    maxWidth: "70%",
+                      message.sender === "user" ? "#007AFF" : "#E9ECEF",
+                    color: message.sender === "user" ? "#ffffff" : "#212529",
+                    p: "10px 14px",
+                    borderRadius:
+                      message.sender === "user"
+                        ? "20px 20px 4px 20px"
+                        : "20px 20px 20px 4px",
+                    maxWidth: "85%",
                     wordWrap: "break-word",
-                    minWidth: "40px",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                   }}
                 >
                   {message.isLoading ? (
-                    <CircularProgress size={20} />
+                    <CircularProgress
+                      size={20}
+                      sx={{
+                        color:
+                          message.sender === "user" ? "#ffffff" : "#007AFF",
+                      }}
+                    />
                   ) : message.sender === "model" ? (
-                    <Box sx={{ lineHeight: 1.3 }}>
-                      {formatBotMessage(message.text)}
-                    </Box>
+                    formatBotMessage(message.text)
                   ) : (
-                    <Typography sx={{ lineHeight: 1.3 }}>
+                    <Typography
+                      sx={{
+                        lineHeight: 1.5,
+                        whiteSpace: "pre-wrap",
+                        wordWrap: "break-word",
+                      }}
+                    >
                       {message.text}
                     </Typography>
                   )}
                 </Box>
-              ))}
-              <div ref={messagesEndRef} />
-            </Box>
+              </Box>
+            ))}
+            <div ref={messagesEndRef} />
+          </Box>
+
+          <Box // Quick responses area
+            sx={{
+              p: 1, // Reduced padding for smaller footer section
+              borderTop: "1px solid #E5E7EB",
+              backgroundColor: "#FFFFFF",
+            }}
+          >
             <Stack
               direction="row"
               spacing={1}
               sx={{
                 overflowX: "auto",
                 whiteSpace: "nowrap",
-                mb: 2,
-                p: 1,
+                pb: 0.5,
+                "&::-webkit-scrollbar": { height: "6px" },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#bdbdbd",
+                  borderRadius: "6px",
+                },
+                "&::-webkit-scrollbar-track": {
+                  backgroundColor: "#f1f1f1",
+                  borderRadius: "6px",
+                },
               }}
             >
               {readyPrompts.map((prompt, index) => (
@@ -399,62 +618,100 @@ export default function Chatbot() {
                   onClick={() => handleSend(prompt)}
                   disabled={isLoading}
                   sx={{
-                    backgroundColor: "#e3f2fd",
-                    color: "#1565c0",
+                    backgroundColor: "#E3F2FD",
+                    color: "#0D47A1",
+                    borderRadius: "16px",
+                    padding: "4px 10px",
+                    fontSize: "0.8rem",
+                    fontWeight: 500,
+                    transition: "background-color 0.2s ease",
                     "&:hover": {
-                      backgroundColor: "#bbdefb",
+                      backgroundColor: "#BBDEFB",
                     },
                   }}
                 />
               ))}
             </Stack>
-            <Stack direction="row" spacing={1}>
-              <TextField
-                fullWidth
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={isLoading}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter" && !isLoading) {
-                    handleSend();
-                  }
-                }}
-                sx={{
-                  backgroundColor: "white",
-                  borderRadius: "4px",
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: "#ccc",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: "#888",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#1565c0",
-                    },
+          </Box>
+
+          <Stack // Footer: Input and Send button
+            direction="row"
+            spacing={1}
+            sx={{
+              p: 0.5, // Reduced padding for smaller footer section
+              borderTop: "1px solid #E5E7EB",
+              backgroundColor: "#FFFFFF", // Kept solid white as per user's last provided code
+              borderBottomLeftRadius: "16px",
+              borderBottomRightRadius: "16px",
+              alignItems: "center",
+            }}
+          >
+            <TextField
+              fullWidth
+              placeholder="Type your message..."
+              variant="outlined"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isLoading}
+              multiline
+              rows={1}
+              maxRows={3}
+              onKeyPress={(e) => {
+                if (e.key === "Enter" && !e.shiftKey && !isLoading) {
+                  e.preventDefault();
+                  handleSend(input);
+                }
+              }}
+              sx={{
+                backgroundColor: "#F3F4F6",
+                borderRadius: "10px", // Adjusted for a more compact look
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "10px", // Match above
+                  paddingRight: "8px",
+                  transition: "border-color 0.2s ease, box-shadow 0.2s ease",
+                  "& fieldset": {
+                    borderColor: "transparent",
                   },
-                }}
-              />
-              <Button
-                variant="contained"
-                onClick={() => handleSend(input)}
-                disabled={isLoading || !input.trim()}
-                sx={{
-                  backgroundColor: "#1565c0",
-                  minWidth: "80px",
-                  "&:hover": {
-                    backgroundColor: "#0d47a1",
+                  "&:hover fieldset": {
+                    borderColor: "#CFD8DC",
                   },
-                  "&:disabled": {
-                    backgroundColor: "#e0e0e0",
-                    color: "#a0a0a0",
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#007AFF",
+                    borderWidth: "1px",
+                    boxShadow: `0 0 0 2px rgba(0, 122, 255, 0.2)`,
                   },
-                }}
-              >
-                Send
-              </Button>
-            </Stack>
+                },
+                "& .MuiInputBase-input": {
+                  padding: "0 12px", // Reduced padding for smaller height
+                  fontSize: "0.9rem", // Reduced font size
+                  lineHeight: 1.0, // Adjusted line height
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={() => handleSend(input)}
+              disabled={isLoading || !input.trim()}
+              sx={{
+                backgroundColor: "#007AFF",
+                borderRadius: "10px", // Match TextField
+                minWidth: "auto",
+                padding: "0 12px", // Adjusted padding
+                height: "46px", // Reduced height to match new TextField height
+                boxShadow: "none",
+                transition: "background-color 0.2s ease",
+                "&:hover": {
+                  backgroundColor: "#005ecb",
+                  boxShadow: "none",
+                },
+                "&:disabled": {
+                  backgroundColor: "#E0E0E0",
+                  color: "#A0A0A0",
+                },
+              }}
+            >
+              Send
+            </Button>
           </Stack>
         </Box>
       )}
