@@ -59,9 +59,10 @@ export function Booking() {
         <Box padding={2} display='flex' justifyContent='center'>
           <Stack sx={{ width: '900px' }} spacing={3} alignItems='stretch'>
             <FlightDetails
+              flight_number={flight.flight_number}
               from={flight.departure_airport}
               to={flight.destination_airport}
-              date={flight.departure_time}
+              date={flight.departure_datetime}
             />
 
             <Steps />
@@ -170,9 +171,9 @@ function Steps() {
 }
 
 const Detail = ({ label, children }) => (
-  <Box sx={{ 
-    display: 'flex', 
-    justifyContent: 'space-between', 
+  <Box sx={{
+    display: 'flex',
+    justifyContent: 'space-between',
     alignItems: 'center'
   }}>
     <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
@@ -456,21 +457,21 @@ function Payment() {
 
                 <Divider sx={{ my: 2 }} />
 
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
                   alignItems: 'center',
                   bgcolor: 'grey.50',
                   p: 2,
                   borderRadius: 1
                 }}>
-                  <Typography variant='h6' sx={{ 
+                  <Typography variant='h6' sx={{
                     color: 'text.secondary',
                     fontWeight: 'bold'
-                  }}> 
+                  }}>
                     Total Amount
                   </Typography>
-                  <Typography variant='h5' sx={{ 
+                  <Typography variant='h5' sx={{
                     fontWeight: 'bold',
                     color: 'primary.main'
                   }}>
@@ -478,9 +479,9 @@ function Payment() {
                   </Typography>
                 </Box>
 
-                <LoadingButton 
-                  loading={loading} 
-                  variant="contained" 
+                <LoadingButton
+                  loading={loading}
+                  variant="contained"
                   onClick={handleClick}
                   size="large"
                   fullWidth
@@ -496,30 +497,30 @@ function Payment() {
           <Stack spacing={3} sx={{ flex: 1 }} alignItems="stretch">
             <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
               <Stack spacing={3}>
-                <Typography variant='h6' sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
+                <Typography variant='h6' sx={{
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                   fontWeight: 'bold'
-                }}> 
-                  <CreditCard /> Booking Summary 
+                }}>
+                  <CreditCard /> Booking Summary
                 </Typography>
-                
-                <Box sx={{ 
-                  bgcolor: 'grey.50', 
-                  p: 2, 
+
+                <Box sx={{
+                  bgcolor: 'grey.50',
+                  p: 2,
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider'
                 }}>
-                  <Typography variant='subtitle1' sx={{ 
+                  <Typography variant='subtitle1' sx={{
                     fontWeight: 'bold',
                     mb: 1,
                     color: 'text.secondary',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1
-                  }}> 
+                  }}>
                     Passenger Information
                   </Typography>
                   <Stack spacing={2}>
@@ -531,21 +532,21 @@ function Payment() {
                   </Stack>
                 </Box>
 
-                <Box sx={{ 
-                  bgcolor: 'grey.50', 
-                  p: 2, 
+                <Box sx={{
+                  bgcolor: 'grey.50',
+                  p: 2,
                   borderRadius: 1,
                   border: '1px solid',
                   borderColor: 'divider'
                 }}>
-                  <Typography variant='subtitle1' sx={{ 
+                  <Typography variant='subtitle1' sx={{
                     fontWeight: 'bold',
                     mb: 1,
                     color: 'text.secondary',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1
-                  }}> 
+                  }}>
                     Flight Details
                   </Typography>
                   <Stack spacing={2}>
