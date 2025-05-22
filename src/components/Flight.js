@@ -32,6 +32,7 @@ export function Flight({ id, flight_number, departure_airport, destination_airpo
       >
         <Stack sx={{ p: 1, width: '100%' }} direction='row' justifyContent='space-between' alignItems='center'>
           <Stack flex={7} direction='row' justifyContent='space-between' alignItems='center'>
+            <Typography fontWeight='bold' color="grey.500"> {flight_number} </Typography>
             <Box>
               <Typography fontWeight='bold' color="grey.500"> {departure_airport} </Typography>
               <Typography fontWeight='bold' variant='h5'> {dayjs(departure_datetime).format('LT')} </Typography>
@@ -68,7 +69,7 @@ export function Flight({ id, flight_number, departure_airport, destination_airpo
   );
 }
 
-export function FlightDetails({ from, to, date }) {
+export function FlightDetails({ flight_number, from, to, date }) {
   return (
     <Box sx={{ p: 3, }}>
       <Stack
@@ -84,10 +85,10 @@ export function FlightDetails({ from, to, date }) {
           <Typography fontWeight='bold' variant='h4'> {to} </Typography>
         </Stack>
 
-        <Typography>
-          <strong> Departure flight: </strong>
-          {dayjs(date).format('ddd, MMM D, YYYY')}
-        </Typography>
+        <Stack direction='column'>
+          <Typography>{flight_number}</Typography>
+          <Typography><strong>{dayjs(date).format('ddd, MMM D, YYYY, HH:MM')}</strong></Typography>
+        </Stack>
       </Stack>
     </Box>
   );

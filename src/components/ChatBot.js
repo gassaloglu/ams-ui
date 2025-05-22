@@ -12,6 +12,7 @@ import {
   CardContent,
   Divider,
 } from "@mui/material";
+
 import {
   SmartToy as SmartToyIcon,
   ArrowBackIos as ArrowBackIosIcon,
@@ -21,318 +22,7 @@ import {
   ConfirmationNumber as ConfirmationNumberIcon, // For booking button
 } from "@mui/icons-material";
 
-// Helper function to apply basic Markdown to text
-const applyMarkdown = (markdownText) => {
-  if (!markdownText) return "";
-  let html = markdownText;
-
-  // Bold: **text** or __text__
-  html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/__(.*?)__/g, "<strong>$1</strong>");
-
-  // Italics: *text* or _text_ (ensure not part of bold)
-  html = html.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
-  html = html.replace(/(?<!_)_(?!_)(.*?)(?<!_)_(?!_)/g, "<em>$1</em>");
-
-  // Strikethrough: ~~text~~
-  html = html.replace(/~~(.*?)~~/g, "<del>$1</del>");
-  // Inline code: `text`
-  html = html.replace(/`(.*?)`/g, "<code>$1</code>");
-
-  return html;
-};
-
-// FlightCards component
-const FlightCards = ({ flights }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  if (!Array.isArray(flights) || flights.length === 0) {
-    return (
-      <Typography sx={{ my: 2, textAlign: "center", color: "text.secondary" }}>
-        No flight information to display.
-      </Typography>
-    );
-  }
-  const flight = flights[currentIndex];
-
-  if (!flight || typeof flight !== "object" || !flight.flight_number) {
-    return (
-      <Typography sx={{ my: 2, textAlign: "center", color: "text.secondary" }}>
-        Invalid flight data encountered.
-      </Typography>
-    );
-  }
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : flights.length - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev < flights.length - 1 ? prev + 1 : 0));
-  };
-
-  const formatDateTime = (dateTimeString) => {
-    const date = new Date(dateTimeString);
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  };
-
-  const calculateDuration = (departure, arrival) => {
-    const dep = new Date(departure);
-    const arr = new Date(arrival);
-    const diff = arr - dep;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
-
-  const handleBookNow = () => {
-    // Placeholder for actual reservation logic
-    alert(
-      `Booking flight ${flight.flight_number} from ${flight.departure_airport} to ${flight.destination_airport}.\nPrice: $${flight.price || "N/A"}`,
-    );
-    // In a real app, this would likely navigate to a booking page or open a modal
-    // TODO
-    //
-    //
-  };
-
-  return (
-    <Box sx={{ position: "relative", width: "100%", my: 2 }}>
-      <IconButton
-        onClick={handlePrev}
-        disabled={flights.length <= 1}
-        sx={{
-          position: "absolute",
-          left: { xs: -10, sm: -20 },
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 1,
-          backgroundColor: "white",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          "&:hover": { backgroundColor: "grey.200" },
-          visibility: flights.length <= 1 ? "hidden" : "visible",
-        }}
-      >
-        <ArrowBackIosIcon fontSize="small" />
-      </IconButton>
-
-      <Card
-        sx={{
-          width: "100%",
-          border: "1px solid #e0e0e0",
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <CardContent sx={{ padding: "16px !important", flexGrow: 1 }}>
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1.5}
-            sx={{ mb: 1.5 }}
-          >
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ fontWeight: "bold" }}
-            >
-              {flight.flight_number}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {flight.departure_airport} → {flight.destination_airport}
-            </Typography>
-          </Stack>
-
-          <Divider sx={{ my: 1.5 }} />
-
-          <Stack spacing={1.5}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <AccessTimeIcon fontSize="small" color="action" />
-              <Typography variant="body2">
-                Departure: {formatDateTime(flight.departure_datetime)}
-              </Typography>
-            </Stack>
-
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1}
-              sx={{ pl: 0 }}
-            >
-              <FlightIcon
-                fontSize="small"
-                color="action"
-                sx={{ transform: "rotate(90deg)", ml: 0.2, mr: 0.8 }}
-              />
-              <Typography variant="body2">
-                Duration:{" "}
-                {calculateDuration(
-                  flight.departure_datetime,
-                  flight.arrival_datetime,
-                )}
-              </Typography>
-            </Stack>
-
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <AccessTimeIcon fontSize="small" color="action" />
-              <Typography variant="body2">
-                Arrival: {formatDateTime(flight.arrival_datetime)}
-              </Typography>
-            </Stack>
-          </Stack>
-
-          <Divider sx={{ my: 1.5 }} />
-
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography
-              variant="h6"
-              color="primary.main"
-              sx={{ fontWeight: "bold" }}
-            >
-              Price: {flight.price || "N/A"} TRY
-            </Typography>
-            {/* Future elements like "Seats left" could go here */}
-          </Stack>
-
-          {flights.length > 1 && (
-            <Typography
-              variant="caption"
-              display="block"
-              textAlign="center"
-              sx={{ mt: 2, color: "text.secondary" }}
-            >
-              Flight option {currentIndex + 1} of {flights.length}
-            </Typography>
-          )}
-        </CardContent>
-        <Divider />
-        <Box sx={{ p: 2, pt: 1.5 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            startIcon={<ConfirmationNumberIcon />}
-            onClick={handleBookNow}
-            sx={{ fontWeight: "bold", borderRadius: "8px" }}
-          >
-            Book Now
-          </Button>
-        </Box>
-      </Card>
-
-      <IconButton
-        onClick={handleNext}
-        disabled={flights.length <= 1}
-        sx={{
-          position: "absolute",
-          right: { xs: -10, sm: -20 },
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 1,
-          backgroundColor: "white",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          "&:hover": { backgroundColor: "grey.200" },
-          visibility: flights.length <= 1 ? "hidden" : "visible",
-        }}
-      >
-        <ArrowForwardIosIcon fontSize="small" />
-      </IconButton>
-    </Box>
-  );
-};
-
-const formatBotMessage = (text) => {
-  const parts = [];
-  let lastIndex = 0;
-
-  const combinedRegex = /```json\s*?\n([\s\S]*?)\n```|(\[[\s\S]*?\])/gs;
-  let match;
-
-  while ((match = combinedRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push({
-        type: "text",
-        content: text.substring(lastIndex, match.index),
-      });
-    }
-
-    const jsonStringContent = match[1] || match[2];
-
-    if (jsonStringContent) {
-      try {
-        const potentialData = JSON.parse(jsonStringContent.trim());
-        if (
-          Array.isArray(potentialData) &&
-          potentialData.length > 0 &&
-          potentialData.every(
-            (f) =>
-              typeof f === "object" &&
-              f !== null &&
-              "flight_number" in f &&
-              "departure_airport" in f &&
-              "destination_airport" in f &&
-              "departure_datetime" in f &&
-              "arrival_datetime" in f,
-          )
-        ) {
-          parts.push({
-            type: "flights",
-            content: potentialData,
-          });
-        }
-      } catch (e) {
-        // console.warn("JSON parsing failed or not flight data:", jsonStringContent, e);
-      }
-    }
-    lastIndex = match.index + match[0].length;
-  }
-
-  if (lastIndex < text.length) {
-    parts.push({
-      type: "text",
-      content: text.substring(lastIndex),
-    });
-  }
-
-  return (
-    <>
-      {parts.map((part, index) => {
-        if (part.type === "text" && part.content.trim()) {
-          const htmlContent = applyMarkdown(part.content.trim());
-          return (
-            <Typography
-              key={`text-${index}`}
-              component="div"
-              sx={{
-                lineHeight: 1.6,
-                whiteSpace: "pre-wrap",
-                wordWrap: "break-word",
-              }}
-              dangerouslySetInnerHTML={{ __html: htmlContent }}
-            />
-          );
-        } else if (part.type === "flights") {
-          return (
-            <FlightCards key={`flights-${index}`} flights={part.content} />
-          );
-        }
-        return null;
-      })}
-    </>
-  );
-};
+import { useNavigate } from "react-router-dom";
 
 // Main Chatbot component
 export default function Chatbot() {
@@ -352,8 +42,326 @@ export default function Chatbot() {
     "Give me Izmir - Istanbul flights in this month",
     "Plan me a summer vacation",
     "Plan me a winter vacation",
-    "What is the biggest plane you have?",
   ];
+
+  const navigate = useNavigate();
+
+  // Helper function to apply basic Markdown to text
+  const applyMarkdown = (markdownText) => {
+    if (!markdownText) return "";
+    let html = markdownText;
+
+    // Bold: **text** or __text__
+    html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    html = html.replace(/__(.*?)__/g, "<strong>$1</strong>");
+
+    // Italics: *text* or _text_ (ensure not part of bold)
+    html = html.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<em>$1</em>");
+    html = html.replace(/(?<!_)_(?!_)(.*?)(?<!_)_(?!_)/g, "<em>$1</em>");
+
+    // Strikethrough: ~~text~~
+    html = html.replace(/~~(.*?)~~/g, "<del>$1</del>");
+    // Inline code: `text`
+    html = html.replace(/`(.*?)`/g, "<code>$1</code>");
+
+    return html;
+  };
+
+  // FlightCards component
+  const FlightCards = ({ flights }) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    if (!Array.isArray(flights) || flights.length === 0) {
+      return (
+        <Typography
+          sx={{ my: 2, textAlign: "center", color: "text.secondary" }}
+        >
+          No flight information to display.
+        </Typography>
+      );
+    }
+    const flight = flights[currentIndex];
+
+    if (!flight || typeof flight !== "object" || !flight.flight_number) {
+      return (
+        <Typography
+          sx={{ my: 2, textAlign: "center", color: "text.secondary" }}
+        >
+          Invalid flight data encountered.
+        </Typography>
+      );
+    }
+
+    const handlePrev = () => {
+      setCurrentIndex((prev) => (prev > 0 ? prev - 1 : flights.length - 1));
+    };
+
+    const handleNext = () => {
+      setCurrentIndex((prev) => (prev < flights.length - 1 ? prev + 1 : 0));
+    };
+
+    const formatDateTime = (dateTimeString) => {
+      const date = new Date(dateTimeString);
+      return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    };
+
+    const calculateDuration = (departure, arrival) => {
+      const dep = new Date(departure);
+      const arr = new Date(arrival);
+      const diff = arr - dep;
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      return `${hours}h ${minutes}m`;
+    };
+
+    const handleBookNow = () => {
+      // Placeholder for actual reservation logic
+      // alert(
+      //   `Booking flight ${flight.flight_number} from ${flight.departure_airport} to ${flight.destination_airport}.\nPrice: $${flight.price || "N/A"}`,
+      // );
+      navigate(`/booking/${flight.id}/essentials`);
+    };
+
+    return (
+      <Box sx={{ position: "relative", width: "100%", my: 2 }}>
+        <IconButton
+          onClick={handlePrev}
+          disabled={flights.length <= 1}
+          sx={{
+            position: "absolute",
+            left: { xs: -10, sm: -20 },
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 1,
+            backgroundColor: "white",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            "&:hover": { backgroundColor: "grey.200" },
+            visibility: flights.length <= 1 ? "hidden" : "visible",
+          }}
+        >
+          <ArrowBackIosIcon fontSize="small" />
+        </IconButton>
+
+        <Card
+          sx={{
+            width: "100%",
+            border: "1px solid #e0e0e0",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <CardContent sx={{ padding: "16px !important", flexGrow: 1 }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              spacing={1.5}
+              sx={{ mb: 1.5 }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                 <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
+                   {flight.flight_number}
+                 </Typography>
+                 <Typography variant="body2" color="text.secondary">
+                   {flight.departure_airport} → {flight.destination_airport}
+                 </Typography>
+               </Stack>
+              <Typography variant="body2">
+                {flight.flight_type}
+              </Typography>
+            </Stack>
+
+            <Divider sx={{ my: 1.5 }} />
+
+            <Stack spacing={1.5}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <AccessTimeIcon fontSize="small" color="action" />
+                <Typography variant="body2">
+                  Departure: {formatDateTime(flight.departure_datetime)}
+                </Typography>
+              </Stack>
+
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1}
+                sx={{ pl: 0 }}
+              >
+                <FlightIcon
+                  fontSize="small"
+                  color="action"
+                  sx={{ transform: "rotate(90deg)", ml: 0.2, mr: 0.8 }}
+                />
+                <Typography variant="body2">
+                  Duration:{" "}
+                  {calculateDuration(
+                    flight.departure_datetime,
+                    flight.arrival_datetime,
+                  )}
+                </Typography>
+              </Stack>
+
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <AccessTimeIcon fontSize="small" color="action" />
+                <Typography variant="body2">
+                  Arrival: {formatDateTime(flight.arrival_datetime)}
+                </Typography>
+              </Stack>
+            </Stack>
+
+            <Divider sx={{ my: 1.5 }} />
+
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography
+                variant="h6"
+                color="primary.main"
+                sx={{ fontWeight: "bold" }}
+              >
+                Price: {flight.price || "N/A"} TRY
+              </Typography>
+              {/* Future elements like "Seats left" could go here */}
+            </Stack>
+
+            {flights.length > 1 && (
+              <Typography
+                variant="caption"
+                display="block"
+                textAlign="center"
+                sx={{ mt: 2, color: "text.secondary" }}
+              >
+                Flight option {currentIndex + 1} of {flights.length}
+              </Typography>
+            )}
+          </CardContent>
+          <Divider />
+          <Box sx={{ p: 2, pt: 1.5 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              startIcon={<ConfirmationNumberIcon />}
+              onClick={handleBookNow}
+              sx={{ fontWeight: "bold", borderRadius: "8px" }}
+            >
+              Book Now
+            </Button>
+          </Box>
+        </Card>
+
+        <IconButton
+          onClick={handleNext}
+          disabled={flights.length <= 1}
+          sx={{
+            position: "absolute",
+            right: { xs: -10, sm: -20 },
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 1,
+            backgroundColor: "white",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            "&:hover": { backgroundColor: "grey.200" },
+            visibility: flights.length <= 1 ? "hidden" : "visible",
+          }}
+        >
+          <ArrowForwardIosIcon fontSize="small" />
+        </IconButton>
+      </Box>
+    );
+  };
+
+  const formatBotMessage = (text) => {
+    const parts = [];
+    let lastIndex = 0;
+
+    const combinedRegex = /```json\s*?\n([\s\S]*?)\n```|(\[[\s\S]*?\])/gs;
+    let match;
+
+    while ((match = combinedRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({
+          type: "text",
+          content: text.substring(lastIndex, match.index),
+        });
+      }
+
+      const jsonStringContent = match[1] || match[2];
+
+      if (jsonStringContent) {
+        try {
+          const potentialData = JSON.parse(jsonStringContent.trim());
+          if (
+            Array.isArray(potentialData) &&
+            potentialData.length > 0 &&
+            potentialData.every(
+              (f) =>
+                typeof f === "object" &&
+                f !== null &&
+                "id" in f &&
+                "flight_number" in f &&
+                "departure_airport" in f &&
+                "destination_airport" in f &&
+                "departure_datetime" in f &&
+                "arrival_datetime" in f,
+            )
+          ) {
+            parts.push({
+              type: "flights",
+              content: potentialData,
+            });
+          }
+        } catch (e) {
+          // console.warn("JSON parsing failed or not flight data:", jsonStringContent, e);
+        }
+      }
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push({
+        type: "text",
+        content: text.substring(lastIndex),
+      });
+    }
+
+    return (
+      <>
+        {parts.map((part, index) => {
+          if (part.type === "text" && part.content.trim()) {
+            const htmlContent = applyMarkdown(part.content.trim());
+            return (
+              <Typography
+                key={`text-${index}`}
+                component="div"
+                sx={{
+                  lineHeight: 1.6,
+                  whiteSpace: "pre-wrap",
+                  wordWrap: "break-word",
+                }}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
+            );
+          } else if (part.type === "flights") {
+            return (
+              <FlightCards key={`flights-${index}`} flights={part.content} />
+            );
+          }
+          return null;
+        })}
+      </>
+    );
+  };
 
   useEffect(() => {
     if (isOpen) {
