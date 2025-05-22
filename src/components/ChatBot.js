@@ -162,18 +162,20 @@ export default function Chatbot() {
             <Stack
               direction="row"
               alignItems="center"
+              justifyContent="space-between"
               spacing={1.5}
               sx={{ mb: 1.5 }}
             >
-              <Typography
-                variant="h6"
-                component="div"
-                sx={{ fontWeight: "bold" }}
-              >
-                {flight.flight_number}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {flight.departure_airport} → {flight.destination_airport}
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                 <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
+                   {flight.flight_number}
+                 </Typography>
+                 <Typography variant="body2" color="text.secondary">
+                   {flight.departure_airport} → {flight.destination_airport}
+                 </Typography>
+               </Stack>
+              <Typography variant="body2">
+                {flight.flight_type}
               </Typography>
             </Stack>
 
