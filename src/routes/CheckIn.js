@@ -44,8 +44,6 @@ export async function checkInLoader({ params: { pnr, surname } }) {
   const checkin = checkinResponse.data;
   const flightResponse = await axios.get(`/flights/${checkin.flight_id}`);
   const flight = flightResponse.data;
-  debugger;
-
   return { checkin, flight };
 }
 
@@ -61,7 +59,7 @@ function Info({ label, children }) {
 const question = (b) => b ? 'Yes' : 'No';
 
 function CheckInData({ checkin, flight }) {
-  const [alreadyCheckedIn, setAlreadyCheckedIn] = useState(checkin.check_in === 1);
+  const [alreadyCheckedIn, setAlreadyCheckedIn] = useState(checkin.check_in);
   const [cancelled, setCancelled] = useState(false);
   const [checkinLoading, setCheckinLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
@@ -76,8 +74,8 @@ function CheckInData({ checkin, flight }) {
     setError(null);
     setWarning(false);
 
-    axios.post('/passenger/checkin', {
-      pnr: checkin.pnr_no,
+    axios.post('/passengers/checkin', {
+      pnr_no: checkin.pnr_no,
       surname: checkin.surname,
     }).then(() => {
       setAlreadyCheckedIn(true);
@@ -100,9 +98,8 @@ function CheckInData({ checkin, flight }) {
     setError(null);
     setWarning(false);
 
-    axios.post('/passenger/remove', {
-      pnr_no: checkin.pnr_no,
-      surname: checkin.surname,
+    axios.patch('/passengers/cancel', {
+      passenger_id: checkin.id,
     }).then(() => {
       setCancelled(true);
     }).catch(error => {
