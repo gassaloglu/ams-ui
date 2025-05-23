@@ -35,12 +35,12 @@ export function Flight({ id, flight_number, departure_airport, destination_airpo
             <Typography fontWeight='bold' color="grey.500"> {flight_number} </Typography>
             <Box>
               <Typography fontWeight='bold' color="grey.500"> {departure_airport} </Typography>
-              <Typography fontWeight='bold' variant='h5'> {dayjs(departure_datetime).format('LT')} </Typography>
+              <Typography fontWeight='bold' variant='h5'> {dayjs(departure_datetime).format('HH:mm')} </Typography>
             </Box>
             <TrendingFlat />
             <Box>
               <Typography fontWeight='bold' color="grey.500"> {destination_airport} </Typography>
-              <Typography fontWeight='bold' variant='h5'> {dayjs(arrival_datetime).format('LT')} </Typography>
+              <Typography fontWeight='bold' variant='h5'> {dayjs(arrival_datetime).format('HH:mm')} </Typography>
             </Box>
           </Stack>
           <Typography fontWeight='bold' flex={6} textAlign='right' variant="h5"> {price} ₺ </Typography>
@@ -87,7 +87,7 @@ export function FlightDetails({ flight_number, from, to, date }) {
 
         <Stack direction='column'>
           <Typography>{flight_number}</Typography>
-          <Typography><strong>{dayjs(date).format('ddd, MMM D, YYYY, HH:MM')}</strong></Typography>
+          <Typography><strong>{dayjs(date).format('ddd, MMM D, YYYY, HH:mm')}</strong></Typography>
         </Stack>
       </Stack>
     </Box>
