@@ -46,6 +46,12 @@ const toolsOfPermission = {
     tools.listUser,
     tools.addMoney
   ],
+  "hr": [
+
+  ],
+  "ground_services": [
+
+  ],
   "admin": Object.values(tools),
 };
 

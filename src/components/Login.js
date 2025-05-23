@@ -36,7 +36,7 @@ export default function Login() {
     let promise;
 
     if (isEmployee) {
-      promise = axios.post('/employees/sessions', { nationalId, password })
+      promise = axios.post('/employees/sessions', { national_id: nationalId, password })
         .then(({ data }) => {
           login({ is_employee: true, ...data });
           const route = location.state?.redirect || '/dashboard';
