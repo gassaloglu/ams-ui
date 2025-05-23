@@ -40,10 +40,11 @@ export function CheckInErrorBoundary() {
 }
 
 export async function checkInLoader({ params: { pnr, surname } }) {
-  const checkinResponse = await axios.get(`/ticket/${pnr}/${surname}`);
-  const checkin = checkinResponse.data[0];
-  const flightResponse = await axios.get(`/flight/${checkin.flight_number}`);
-  const flight = flightResponse.data[0];
+  const checkinResponse = await axios.get(`/passengers/pnr?pnr_no=${pnr}&surname=${surname}`);
+  const checkin = checkinResponse.data;
+  const flightResponse = await axios.get(`/flights/${checkin.flight_id}`);
+  const flight = flightResponse.data;
+  debugger;
 
   return { checkin, flight };
 }
@@ -182,7 +183,7 @@ function CheckInData({ checkin, flight }) {
             <Info label="Seat number"> {indexToAlphaIndex(checkin.seat)} </Info>
           </Grid>
           <Grid item xs={3}>
-            <Info label="Luggage number"> {checkin.luggage_id} </Info>
+            <Info label="Gate"> {flight.departure_gate_number} </Info>
           </Grid>
           <Grid item xs={3}>
             <Info label="Baggage allowance"> {checkin.baggage_allowance} kg. </Info>
