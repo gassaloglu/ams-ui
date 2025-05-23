@@ -30,7 +30,7 @@ export function Booking() {
   const { flight, occupation, plan } = useLoaderData();
   const [step, setStep] = useState(0);
   const [booking, updateBooking] = useImmer({
-    flight_number: flight.flight_number,
+    flight_id: flight.flight_number,
     fare_type: plan.toLowerCase(),
     national_id: '',
     name: '',
@@ -38,9 +38,15 @@ export function Booking() {
     email: '',
     phone: '',
     gender: 'male',
-    disabled: 0,
+    disabled: false,
     seat: null,
     birth_date: null,
+    baggage_allowance: 15,
+    extra_baggage: 0,
+    meal: '',
+    cip_member: false,
+    vip_member: false,
+    child: false
   });
 
   const nextStep = () => setStep(step + 1)
@@ -299,6 +305,11 @@ function Payment() {
         seat: seatToIndex(booking.seat),
         child: Boolean(dayjs().diff(booking.birth_date, 'year', true) < 10),
         disabled: Boolean(booking.disabled),
+        baggage_allowance: 15,
+        extra_baggage: 0,
+        meal: '',
+        cip_member: false,
+        vip_member: false
       },
       credit_card: {
         card_number: cardDetails.cardNumber,

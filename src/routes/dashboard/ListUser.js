@@ -42,12 +42,6 @@ const columns = [
     headerName: 'Phone',
     flex: 1,
   },
-  {
-    field: 'money',
-    headerName: 'Balance',
-    flex: 1,
-    valueFormatter: params => params.value + ' ₺'
-  },
 ];
 
 export function ListUser() {
@@ -72,6 +66,6 @@ export function ListUser() {
 }
 
 export async function listUserLoader() {
-  const response = await axios.get('/profile/users');
+  const response = await axios.get('/users');
   return response.data;
 }

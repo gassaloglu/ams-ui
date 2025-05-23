@@ -4,7 +4,7 @@ import { Box, Chip } from '@mui/material';
 import { useLoaderData } from 'react-router-dom';
 import { EmptyPage } from '../../components/Page';
 import dayjs from 'dayjs';
-import { orange, teal, deepPurple, pink } from '@mui/material/colors';
+import { green, orange, teal, deepPurple, pink } from '@mui/material/colors';
 
 const permissions = {
   flight_planner: {
@@ -42,6 +42,13 @@ const permissions = {
       color: 'white',
     }
   },
+  hr: {
+    label: 'Human Resources',
+    style: {
+      backgroundColor: green[500],
+      color: 'white',
+    }
+  }
 }
 
 const Permission = ({ value }) => {
@@ -87,13 +94,8 @@ const columns = [
     flex: 1,
   },
   {
-    field: 'title',
-    headerName: 'Title',
-    flex: 1,
-  },
-  {
-    field: 'permission',
-    headerName: 'Permission',
+    field: 'role',
+    headerName: 'Role',
     flex: 1,
     renderCell: params => <Permission value={params.value} />
   },
@@ -120,6 +122,6 @@ export function ListEmployee() {
 }
 
 export async function listEmployeeLoader() {
-  const response = await axios.get('/profile/employee');
+  const response = await axios.get('/employees');
   return response.data;
 }

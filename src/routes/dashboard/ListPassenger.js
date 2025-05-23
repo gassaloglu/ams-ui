@@ -51,7 +51,7 @@ const columns = [
     flex: 1.6,
   },
   {
-    field: 'flight_number',
+    field: 'flight_id',
     headerName: 'Flight',
     flex: 1,
   },
@@ -74,8 +74,8 @@ const columns = [
     renderCell: params => <Question value={params.value} />,
   },
   {
-    field: 'luggage_id',
-    headerName: 'Luggage',
+    field: 'transaction_id',
+    headerName: 'Transaction',
     flex: 1.7,
   },
   {
@@ -85,8 +85,8 @@ const columns = [
     valueFormatter: params => params.value + ' kg.'
   },
   {
-    field: 'extra_luggage',
-    headerName: 'Extra Luggage',
+    field: 'extra_baggage',
+    headerName: 'Extra Baggage',
     flex: 1,
     valueFormatter: params => params.value + ' kg.'
   },
@@ -164,6 +164,6 @@ export function ListPassenger() {
 }
 
 export async function listPassengerLoader() {
-  const response = await axios.get('/passenger/all');
+  const response = await axios.get('/passengers');
   return response.data;
 }

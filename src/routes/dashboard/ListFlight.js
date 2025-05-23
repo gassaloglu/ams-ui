@@ -50,19 +50,19 @@ const columns = [
     flex: 1,
   },
   {
-    field: 'departure_time',
+    field: 'departure_datetime',
     headerName: 'Departure',
     flex: 2,
     valueFormatter: dateFormatter,
   },
   {
-    field: 'arrival_time',
+    field: 'arrival_datetime',
     headerName: 'Arrival',
     flex: 2,
     valueFormatter: dateFormatter,
   },
   {
-    field: 'gate_number',
+    field: 'departure_gate_number',
     headerName: 'Gate',
     flex: 1,
   },
@@ -101,6 +101,6 @@ export function ListFlight() {
 }
 
 export async function listFlightLoader() {
-  const response = await axios.get('/flight/all');
+  const response = await axios.get('/flights');
   return response.data;
 }

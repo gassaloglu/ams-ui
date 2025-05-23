@@ -17,8 +17,13 @@ const Status = ({ active }) =>
 
 const columns = [
   {
-    field: 'plane_registration',
+    field: 'registration',
     headerName: 'Registration',
+    flex: 1,
+  },
+  {
+    field: 'manufacturer',
+    headerName: 'Manufacturer',
     flex: 1,
   },
   {
@@ -27,17 +32,12 @@ const columns = [
     flex: 1,
   },
   {
-    field: 'location',
-    headerName: 'Location',
-    flex: 1,
-  },
-  {
-    field: 'max_passengers',
+    field: 'capacity',
     headerName: 'Capacity',
     flex: 1,
   },
   {
-    field: 'is_active',
+    field: 'status',
     headerName: 'Status',
     flex: 1,
     renderCell: params => <Status active={params.value} />,
@@ -46,7 +46,7 @@ const columns = [
 
 export function ListPlane() {
   const rows = useLoaderData()
-    .map(row => Object.assign(row, { id: row.plane_registration }));
+    .map(row => Object.assign(row, { id: row.id }));
 
   return (
     <EmptyPage>
@@ -65,6 +65,6 @@ export function ListPlane() {
 }
 
 export async function listPlaneLoader() {
-  const response = await axios.get('/plane/all');
+  const response = await axios.get('/planes');
   return response.data;
 }
