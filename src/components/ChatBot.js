@@ -103,11 +103,22 @@ export default function Chatbot() {
     const getInitialCurrentIndex = () => {
       try {
         const stored = localStorage.getItem(LS_CURRENT_INDEX_KEY);
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+          const parsedIndex = JSON.parse(stored);
+          // Ensure the index is within valid bounds
+          return Math.min(Math.max(0, parsedIndex), flights.length - 1);
+        }
       } catch {}
       return 0;
     };
     const [currentIndex, setCurrentIndex] = useState(getInitialCurrentIndex);
+
+    // Update currentIndex if flights array changes
+    useEffect(() => {
+      if (currentIndex >= flights.length) {
+        setCurrentIndex(0);
+      }
+    }, [flights, currentIndex]);
 
     useEffect(() => {
       localStorage.setItem(LS_CURRENT_INDEX_KEY, JSON.stringify(currentIndex));
