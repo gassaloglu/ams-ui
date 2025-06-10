@@ -11,6 +11,7 @@ import {
   Card,
   CardContent,
   Divider,
+  Tooltip,
 } from "@mui/material";
 
 import {
@@ -20,21 +21,50 @@ import {
   AccessTime as AccessTimeIcon,
   Flight as FlightIcon,
   ConfirmationNumber as ConfirmationNumberIcon, // For booking button
+  Refresh as RefreshIcon,
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 
 // Main Chatbot component
 export default function Chatbot() {
-  const [input, setInput] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      sender: "model",
-      text: "Hi there!👋 How can I assist you today?",
-      key: `model-initial-${Date.now()}`,
-    },
-  ]);
+  // LocalStorage keys
+  const LS_MESSAGES_KEY = "chatbot_messages";
+  const LS_ISOPEN_KEY = "chatbot_isOpen";
+  const LS_INPUT_KEY = "chatbot_input";
+
+  // Load initial state from localStorage
+  const getInitialMessages = () => {
+    try {
+      const stored = localStorage.getItem(LS_MESSAGES_KEY);
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return [
+      {
+        sender: "model",
+        text: "Hi there!👋 How can I assist you today?",
+        key: `model-initial-${Date.now()}`,
+      },
+    ];
+  };
+  const getInitialIsOpen = () => {
+    try {
+      const stored = localStorage.getItem(LS_ISOPEN_KEY);
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return false;
+  };
+  const getInitialInput = () => {
+    try {
+      const stored = localStorage.getItem(LS_INPUT_KEY);
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return "";
+  };
+
+  const [input, setInput] = useState(getInitialInput);
+  const [isOpen, setIsOpen] = useState(getInitialIsOpen);
+  const [messages, setMessages] = useState(getInitialMessages);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
@@ -69,7 +99,19 @@ export default function Chatbot() {
 
   // FlightCards component
   const FlightCards = ({ flights }) => {
-    const [currentIndex, setCurrentIndex] = useState(0);
+    const LS_CURRENT_INDEX_KEY = "flightcards_currentIndex";
+    const getInitialCurrentIndex = () => {
+      try {
+        const stored = localStorage.getItem(LS_CURRENT_INDEX_KEY);
+        if (stored) return JSON.parse(stored);
+      } catch {}
+      return 0;
+    };
+    const [currentIndex, setCurrentIndex] = useState(getInitialCurrentIndex);
+
+    useEffect(() => {
+      localStorage.setItem(LS_CURRENT_INDEX_KEY, JSON.stringify(currentIndex));
+    }, [currentIndex]);
 
     if (!Array.isArray(flights) || flights.length === 0) {
       return (
@@ -121,32 +163,49 @@ export default function Chatbot() {
     };
 
     const handleBookNow = () => {
-      // Placeholder for actual reservation logic
-      // alert(
-      //   `Booking flight ${flight.flight_number} from ${flight.departure_airport} to ${flight.destination_airport}.\nPrice: $${flight.price || "N/A"}`,
-      // );
       navigate(`/booking/${flight.id}/essentials`);
     };
 
     return (
       <Box sx={{ position: "relative", width: "100%", my: 2 }}>
-        <IconButton
-          onClick={handlePrev}
-          disabled={flights.length <= 1}
-          sx={{
-            position: "absolute",
-            left: { xs: -10, sm: -20 },
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 1,
-            backgroundColor: "white",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            "&:hover": { backgroundColor: "grey.200" },
-            visibility: flights.length <= 1 ? "hidden" : "visible",
-          }}
-        >
-          <ArrowBackIosIcon fontSize="small" />
-        </IconButton>
+        {flights.length > 1 && (
+          <>
+            <IconButton
+              onClick={handlePrev}
+              sx={{
+                position: "absolute",
+                left: -20,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 1,
+                backgroundColor: "white",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                "&:hover": { backgroundColor: "grey.100" },
+                width: 36,
+                height: 36,
+              }}
+            >
+              <ArrowBackIosIcon fontSize="small" />
+            </IconButton>
+            <IconButton
+              onClick={handleNext}
+              sx={{
+                position: "absolute",
+                right: -20,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 1,
+                backgroundColor: "white",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                "&:hover": { backgroundColor: "grey.100" },
+                width: 36,
+                height: 36,
+              }}
+            >
+              <ArrowForwardIosIcon fontSize="small" />
+            </IconButton>
+          </>
+        )}
 
         <Card
           sx={{
@@ -156,35 +215,46 @@ export default function Chatbot() {
             boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
             display: "flex",
             flexDirection: "column",
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+              transform: "translateY(-2px)",
+              boxShadow: "0 6px 16px rgba(0,0,0,0.1)",
+            },
           }}
         >
-          <CardContent sx={{ padding: "16px !important", flexGrow: 1 }}>
+          <CardContent sx={{ padding: "20px !important", flexGrow: 1 }}>
             <Stack
               direction="row"
               alignItems="center"
               justifyContent="space-between"
               spacing={1.5}
-              sx={{ mb: 1.5 }}
+              sx={{ mb: 2 }}
             >
               <Stack direction="row" alignItems="center" spacing={1.5}>
-                 <Typography variant="h6" component="div" sx={{ fontWeight: "bold" }}>
-                   {flight.flight_number}
-                 </Typography>
-                 <Typography variant="body2" color="text.secondary">
-                   {flight.departure_airport} → {flight.destination_airport}
-                 </Typography>
-               </Stack>
-              <Typography variant="body2">
-                {flight.flight_type}
-              </Typography>
+                <Typography variant="h6" component="div" sx={{ fontWeight: "bold", color: "primary.main" }}>
+                  {flight.flight_number}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  {flight.departure_airport} → {flight.destination_airport}
+                </Typography>
+              </Stack>
+              <Chip
+                label={flight.flight_type}
+                size="small"
+                sx={{
+                  backgroundColor: "primary.light",
+                  color: "white",
+                  fontWeight: 500,
+                }}
+              />
             </Stack>
 
-            <Divider sx={{ my: 1.5 }} />
+            <Divider sx={{ my: 2 }} />
 
-            <Stack spacing={1.5}>
+            <Stack spacing={2}>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <AccessTimeIcon fontSize="small" color="action" />
-                <Typography variant="body2">
+                <AccessTimeIcon fontSize="small" color="primary" />
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   Departure: {formatDateTime(flight.departure_datetime)}
                 </Typography>
               </Stack>
@@ -197,10 +267,10 @@ export default function Chatbot() {
               >
                 <FlightIcon
                   fontSize="small"
-                  color="action"
+                  color="primary"
                   sx={{ transform: "rotate(90deg)", ml: 0.2, mr: 0.8 }}
                 />
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   Duration:{" "}
                   {calculateDuration(
                     flight.departure_datetime,
@@ -210,14 +280,14 @@ export default function Chatbot() {
               </Stack>
 
               <Stack direction="row" alignItems="center" spacing={1}>
-                <AccessTimeIcon fontSize="small" color="action" />
-                <Typography variant="body2">
+                <AccessTimeIcon fontSize="small" color="primary" />
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   Arrival: {formatDateTime(flight.arrival_datetime)}
                 </Typography>
               </Stack>
             </Stack>
 
-            <Divider sx={{ my: 1.5 }} />
+            <Divider sx={{ my: 2 }} />
 
             <Stack
               direction="row"
@@ -229,9 +299,8 @@ export default function Chatbot() {
                 color="primary.main"
                 sx={{ fontWeight: "bold" }}
               >
-                Price: {flight.price || "N/A"} TRY
+                {flight.price || "N/A"} TRY
               </Typography>
-              {/* Future elements like "Seats left" could go here */}
             </Stack>
 
             {flights.length > 1 && (
@@ -241,7 +310,7 @@ export default function Chatbot() {
                 textAlign="center"
                 sx={{ mt: 2, color: "text.secondary" }}
               >
-                Flight option {currentIndex + 1} of {flights.length}
+                Flight {currentIndex + 1} of {flights.length}
               </Typography>
             )}
           </CardContent>
@@ -253,30 +322,20 @@ export default function Chatbot() {
               fullWidth
               startIcon={<ConfirmationNumberIcon />}
               onClick={handleBookNow}
-              sx={{ fontWeight: "bold", borderRadius: "8px" }}
+              sx={{
+                fontWeight: "bold",
+                borderRadius: "8px",
+                py: 1,
+                transition: "transform 0.2s ease-in-out",
+                "&:hover": {
+                  transform: "translateY(-1px)",
+                },
+              }}
             >
               Book Now
             </Button>
           </Box>
         </Card>
-
-        <IconButton
-          onClick={handleNext}
-          disabled={flights.length <= 1}
-          sx={{
-            position: "absolute",
-            right: { xs: -10, sm: -20 },
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 1,
-            backgroundColor: "white",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            "&:hover": { backgroundColor: "grey.200" },
-            visibility: flights.length <= 1 ? "hidden" : "visible",
-          }}
-        >
-          <ArrowForwardIosIcon fontSize="small" />
-        </IconButton>
       </Box>
     );
   };
@@ -456,6 +515,34 @@ export default function Chatbot() {
     setIsOpen(!isOpen);
   };
 
+  const handleRefresh = () => {
+    // Clear localStorage
+    localStorage.removeItem(LS_MESSAGES_KEY);
+    localStorage.removeItem(LS_ISOPEN_KEY);
+    localStorage.removeItem(LS_INPUT_KEY);
+    
+    // Reset state
+    setMessages([
+      {
+        sender: "model",
+        text: "Hi there!👋 How can I assist you today?",
+        key: `model-initial-${Date.now()}`,
+      },
+    ]);
+    setInput("");
+  };
+
+  // Persist state to localStorage on change
+  useEffect(() => {
+    localStorage.setItem(LS_MESSAGES_KEY, JSON.stringify(messages));
+  }, [messages]);
+  useEffect(() => {
+    localStorage.setItem(LS_ISOPEN_KEY, JSON.stringify(isOpen));
+  }, [isOpen]);
+  useEffect(() => {
+    localStorage.setItem(LS_INPUT_KEY, JSON.stringify(input));
+  }, [input]);
+
   return (
     <>
       <IconButton
@@ -511,25 +598,60 @@ export default function Chatbot() {
         >
           <Box
             sx={{
-              py: 1.5,
+              py: 1,
               px: 2,
               borderBottom: "1px solid #E5E7EB",
               backgroundColor: "#F9FAFB",
               borderTopLeftRadius: "16px",
               borderTopRightRadius: "16px",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              minHeight: "48px",
             }}
           >
             <Typography
               variant="h6"
               sx={{
                 color: "#1F2937",
-                textAlign: "center",
                 fontWeight: 600,
-                fontSize: "1.1rem",
+                fontSize: "1rem",
+                lineHeight: 1.2,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
               }}
             >
+              <span role="img" aria-label="plane">✈️</span>
               Flight Assistant
             </Typography>
+            <Tooltip 
+              title="Start a new conversation" 
+              placement="bottom"
+              arrow
+              sx={{
+                '& .MuiTooltip-tooltip': {
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  fontSize: '0.8rem',
+                  padding: '6px 10px',
+                }
+              }}
+            >
+              <IconButton
+                onClick={handleRefresh}
+                size="small"
+                sx={{
+                  color: "primary.main",
+                  "&:hover": {
+                    backgroundColor: "primary.light",
+                    color: "white",
+                  },
+                  transition: "all 0.2s ease-in-out",
+                }}
+              >
+                <RefreshIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
 
           <Box
