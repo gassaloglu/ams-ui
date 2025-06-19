@@ -4,7 +4,7 @@ import { Link, NavLink as NavLinkBase, Outlet, useRouteError } from 'react-route
 import Error from "../components/Error";
 import { Center } from "../components/Styled";
 import { useAuth } from '../hooks/useAuth';
-import { AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Person, PersonAddAlt1, Warehouse } from '@mui/icons-material';
+import { SmartToy, AirlineSeatReclineNormal, Airlines, AirplaneTicket, AttachMoney, Badge, ConnectingAirports, Flight, FlightTakeoff, Person, PersonAddAlt1, Warehouse } from '@mui/icons-material';
 import { EmptyPage } from '../components/Page';
 import { Poll } from '@mui/icons-material';
 
@@ -23,12 +23,13 @@ const tools = {
   addMoney: { name: "Add money to user", link: "/dashboard/add-money", icon: <AttachMoney /> },
   addFlight: { name: "Add flight", link: "/dashboard/add-flight", icon: <ConnectingAirports /> },
   checkIn: { name: "Check-in", link: "/dashboard/check-in", icon: <AirplaneTicket /> },
-  surveyResults: { 
-    name: "Survey Results", 
-    link: "http://127.0.0.1:5000/results", 
-    icon: <Poll />, 
-    external: true 
+  surveyResults: {
+    name: "Survey Results",
+    link: "http://127.0.0.1:5000/results",
+    icon: <Poll />,
+    external: true
   },
+  aiAssistant: { name: "AI Assistant", link: "/dashboard/ai-assistant", icon: <SmartToy /> },
 };
 
 const toolsOfPermission = {
@@ -71,7 +72,7 @@ export function Dashboard() {
   const { user, logout } = useAuth();
 
   return (
-    <Stack direction='row'>
+    <Stack direction='row' sx={{ height: '100vh', minHeight: 0 }}>
       <Drawer
         anchor='left'
         variant='permanent'
@@ -163,7 +164,9 @@ export function Dashboard() {
         </Stack>
 
       </ Drawer >
-      <Outlet />
+      <Box sx={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <Outlet />
+      </Box>
     </Stack>
   );
 }

@@ -39,6 +39,7 @@ import About from './routes/About';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import AiAssistant from './routes/dashboard/AiAssistant';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -164,7 +165,11 @@ const router = createBrowserRouter([
           {
             path: "check-in",
             element: <CheckInPanel />
-          }
+          },
+          {
+            path: "ai-assistant",
+            element: <AiAssistant />
+          },
         ].map(route => Object.assign(route, { errorElement: <DashboardErrorBoundary /> }))
       },
     ],
