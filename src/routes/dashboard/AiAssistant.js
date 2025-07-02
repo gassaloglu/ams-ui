@@ -119,7 +119,7 @@ export default function AiAssistant() {
                         content: msg.text,
                     }));
                 const response = await fetch(
-                    "http://127.0.0.1:8081/api/v1/query_model",
+                    "http://127.0.0.1:8081/api/v1/employee_rag",
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -344,7 +344,7 @@ export default function AiAssistant() {
                         },
                     }}
                 >
-                    {readyPrompts.map((prompt, index) => (
+                    {/* {readyPrompts.map((prompt, index) => (
                         <Chip
                             key={index}
                             label={prompt}
@@ -363,7 +363,7 @@ export default function AiAssistant() {
                                 },
                             }}
                         />
-                    ))}
+                    ))} */}
                 </Stack>
                 <Stack
                     direction="row"
