@@ -18,9 +18,9 @@ const tools = {
   listPassengers: { name: "List passengers", link: "/dashboard/list-passenger", icon: <AirlineSeatReclineNormal /> },
   listEmployee: { name: "List employees", link: "/dashboard/list-employee", icon: <Badge /> },
   listUser: { name: "List users", link: "/dashboard/list-user", icon: <Person /> },
+  listTransactions: { name: "List transactions", link: "/dashboard/list-transaction", icon: <AttachMoney /> },
   addPlane: { name: "Add plane", link: "/dashboard/add-plane", icon: <Warehouse /> },
   addEmployee: { name: "Add employee", link: "/dashboard/add-employee", icon: <PersonAddAlt1 /> },
-  addMoney: { name: "Add money to user", link: "/dashboard/add-money", icon: <AttachMoney /> },
   addFlight: { name: "Add flight", link: "/dashboard/add-flight", icon: <ConnectingAirports /> },
   checkIn: { name: "Check-in", link: "/dashboard/check-in", icon: <AirplaneTicket /> },
   surveyResults: {
@@ -45,7 +45,6 @@ const toolsOfPermission = {
   ],
   "seller": [
     tools.listUser,
-    tools.addMoney
   ],
   "hr": [
 

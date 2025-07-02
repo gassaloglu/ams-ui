@@ -17,7 +17,6 @@ import { Flights, FlightsErrorBoundary, flightsLoader } from './routes/Flights';
 
 import AddEmployee from './routes/dashboard/AddEmployee';
 import AddFlight from './routes/dashboard/AddFlight';
-import AddMoney from './routes/dashboard/AddMoney';
 import AddPlane from './routes/dashboard/AddPlane';
 import CheckInPanel from './routes/dashboard/CheckInPanel';
 import DashboardIndex from './routes/dashboard/DashboardIndex';
@@ -27,6 +26,7 @@ import { ListPassenger, listPassengerLoader } from './routes/dashboard/ListPasse
 import { ListPlane, listPlaneLoader } from './routes/dashboard/ListPlane';
 import { ListUser, listUserLoader } from './routes/dashboard/ListUser';
 import { Dashboard, DashboardErrorBoundary } from './routes/Dashboard';
+import { ListTransaction, listTransactionLoader } from './routes/dashboard/ListTransaction';
 
 import { Typography, Button, Stack } from '@mui/material';
 
@@ -155,10 +155,6 @@ const router = createBrowserRouter([
             element: <AddEmployee />
           },
           {
-            path: "add-money",
-            element: <AddMoney />
-          },
-          {
             path: "add-flight",
             element: <AddFlight />
           },
@@ -169,6 +165,11 @@ const router = createBrowserRouter([
           {
             path: "ai-assistant",
             element: <AiAssistant />
+          },
+          {
+            path: "list-transaction",
+            element: <ListTransaction />,
+            loader: listTransactionLoader,
           },
         ].map(route => Object.assign(route, { errorElement: <DashboardErrorBoundary /> }))
       },
